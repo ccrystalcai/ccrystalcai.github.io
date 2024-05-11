@@ -10,20 +10,20 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🦋 人生闯关LifeOS </title>
+    <title>🍭 LifeOS </title>
     <style type="text/css">
         .box {
             width: 100%;
             text-align: center;
-            background-color: #7acaf5;
-            color: #1660ba;
+            background-color: #f7f3e8;
+            color: #9d8063;
             padding: 10px 0;
             border-radius: 5px;
         }
 
         #visitors_value_page_pv,
         #name {
-            color: #024fad;
+            color: #d95475;
             font-weight: bold;
         }
 
@@ -33,29 +33,29 @@
         }
 
         #contact a {
-            color: #575051;
+            color: #d95475;
             text-decoration: none;
         }
 
         strong {
             display: inline-block;
             padding: 0 7px;
-            background-color: rgba(105, 126, 94, 1);
+            background-color: #eae0e9;
             border-radius: 5px;
             margin: 0 2px;
-            color: #d6e1ce;
+            color: #846e89;
         }
     </style>
 </head>
 
 <body>
     <div class="box">
-        <span id="busuanzi_container_page_pv">🎉 你是「<strong id="template"></strong>」的第 <span
-                id="visitors_value_page_pv"></span> 位<span id="label"></span>，感谢支持&关注<span id="name">「是小懒同学」</span></span>
+        <span id="visitors_container_page_pv">💗 你是 # <strong id="template"></strong> # 的第 <span
+                id="visitors_value_page_pv"></span> 位<span id="label"></span>，感谢支持&关注<span id="name">「是小懒同学」💗</span></span>
         <p id="contact"><span>小红书：<a target="blank"
                     href="https://www.xiaohongshu.com/user/profile/5582b5d4f5a26378ae6c331a">@是小懒同学</a></span>
             | <span>B站：<a href="https://b23.tv/WRxy0N8"
-                    target="blank">是小懒同学_</a></span> | <span>微信公众号：<a href="#">是小懒同学</a></span></p>
+                    target="blank">@是小懒同学_</a></span> | <span>微信公众号：<a href="#">@是小懒同学</a></span></p>
     </div>
 </body>
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
@@ -68,7 +68,7 @@
         }
         return null;
     }
-    const label = getQueryString('label') || '访问者'
+    const label = getQueryString('label') || '来访者'
     document.getElementById('label').innerHTML = label;
     document.getElementById('template').innerHTML = document.title;
 </script>
