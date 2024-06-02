@@ -1,0 +1,76 @@
+<!--
+ * @Author: Crystal Cai
+ * @Description: 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 运动健身 </title>
+    <style type="text/css">
+        .box {
+            width: 100%;
+            text-align: center;
+            background-color: #f7f3e8;
+            color: #9d8063;
+            padding: 10px 0;
+            border-radius: 5px;
+        }
+
+        #busuanzi_value_page_pv,
+        #name {
+            color: #d95475;
+            font-weight: bold;
+        }
+
+        #contact {
+            font-size: 12px;
+            opacity: .8;
+        }
+
+        #contact a {
+            color: #d95475;
+            text-decoration: none;
+        }
+
+        strong {
+            display: inline-block;
+            padding: 0 7px;
+            background-color: #eae0e9;
+            border-radius: 5px;
+            margin: 0 2px;
+            color: #846e89;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <span id="busuanzi_container_page_pv">💗 你是 # <strong id="template"></strong> # 的第 <span
+                id="busuanzi_value_page_pv"></span> 位<span id="label"></span>，感谢支持&关注<span id="name">「是小懒同学」💗</span></span>
+        <p id="contact"><span>小红书：<a target="blank"
+                    href="https://www.xiaohongshu.com/user/profile/5582b5d4f5a26378ae6c331a">@是小懒同学</a></span>
+            | <span>B站：<a href="https://b23.tv/WRxy0N8"
+                    target="blank">@是小懒同学_</a></span> | <span>微信公众号：<a href="#">@是小懒同学</a></span></p>
+    </div>
+</body>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script>
+    function getQueryString(name) {
+        let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        let r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return decodeURIComponent(r[2]);
+        }
+        return null;
+    }
+    const label = getQueryString('label') || '来访者'
+    document.getElementById('label').innerHTML = label;
+    document.getElementById('template').innerHTML = document.title;
+</script>
+
+</html>
