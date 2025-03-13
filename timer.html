@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notion 计时器</title>
+    <style>
+        .container {
+            text-align: center;
+            margin: 50px auto;
+            max-width: 200px;
+        }
+        #timer {
+            font-size: 48px;
+            margin: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 10px;
+            margin: 3px;
+            cursor: pointer;
+        }
+        #taskName {
+            padding: 8px;
+            width: 180px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>任务计时器</h1>
+        <input type="text" id="taskName" placeholder="输入任务名称">
+        <div id="timer">00:00:00</div>
+        <button onclick="startTimer()">开始</button>
+        <button onclick="togglePause()" id="pauseBtn" disabled>暂停</button>
+        <button onclick="stopTimer()" disabled>停止</button>
+        <button onclick="resetTimer()">重置</button>
+    </div>
+
+    <script>
+        // Notion配置信息
+        const NOTION_API_KEY = 'secret_ciWipRePr8jsZKWJTbXI0XkRTQ64v9xEIi8YlrGZs94';
+        const DATABASE_ID = '1713273329d380cea5acc0dcb40e7730';
+        
+        let timer;
+        let startTime;
+        let elapsedTime = 0;
+        let isRunning = false;
+        let isPaused = false;
+
+        function updateDisplay() {
+            const totalSeconds = Math.floor(elapsedTime / 1000);
+            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+            document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                const taskName = document.getElementById('taskName').value.trim();
+                if (!taskName) {
+                    alert('请输入任务名称');
+                    return;
+                }
+                
+                startTime = Date.now() - elapsedTime;
+                timer = setInterval(() => {
+                    elapsedTime = Date.now() - startTime;
+                    updateDisplay();
+                }, 1000);
+                
+                isRunning = true;
+                document.getElementById('pauseBtn').disabled = false;
+                document.querySelector('button[onclick="stopTimer()"]').disabled = false;
+            }
+        }
+
+        function togglePause() {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+                isPaused = true;
+                document.getElementById('pauseBtn').textContent = '继续';
+            } else if (isPaused) {
+                startTime = Date.now() - elapsedTime;
+                timer = setInterval(() => {
+                    elapsedTime = Date.now() - startTime;
+                    updateDisplay();
+                }, 1000);
+                isRunning = true;
+                isPaused = false;
+                document.getElementById('pauseBtn').textContent = '暂停';
+            }
+        }
+
+        function stopTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            isPaused = false;
+            sendToNotion();
+            resetControls();
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            elapsedTime = 0;
+            isRunning = false;
+            isPaused = false;
+            updateDisplay();
+            resetControls();
+            document.getElementById('taskName').value = '';
+        }
+
+        function resetControls() {
+            document.getElementById('pauseBtn').disabled = true;
+            document.querySelector('button[onclick="stopTimer()"]').disabled = true;
+            document.getElementById('pauseBtn').textContent = '暂停';
+        }
+
+        async function sendToNotion() {
+            const startDate = new Date(startTime);
+            const endDate = new Date();
+            const taskName = document.getElementById('taskName').value.trim() || '未命名任务';
+
+            try {
+                const response = await fetch('https://api.notion.com/v1/pages', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${NOTION_API_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Notion-Version': '2022-06-28'
+                    },
+                    body: JSON.stringify({
+                        parent: { database_id: DATABASE_ID },
+                        properties: {
+                            "专注": {
+                                title: [
+                                    { text: { content: taskName } }
+                                ]
+                            },
+                            "开始": {
+                                date: { start: startDate.toISOString() }
+                            },
+                            "完成": {
+                                date: { start: endDate.toISOString() }
+                            },
+                            "持续时间": {
+                                number: elapsedTime / 1000
+                            }
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    alert('数据已保存到Notion！');
+                } else {
+                    throw new Error(await response.text());
+                }
+            } catch (error) {
+                alert('保存失败: ' + error.message);
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
