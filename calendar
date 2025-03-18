@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>月历</title>
+    <style>
+        :root {
+            --highlight-color: #e6f3ff;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .phone-frame {
+            background: white;
+            width: 320px;
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .month-year {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .current-time {
+            font-size: 14px;
+            color: #666;
+            font-family: monospace;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: #666;
+            font-weight: normal;
+            padding: 12px 0;
+            font-size: 13px;
+        }
+
+        td {
+            text-align: center;
+            padding: 12px 0;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .current-week::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 32px;
+            height: 32px;
+            background-color: var(--highlight-color);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .other-month {
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="calendar-header">
+            <div class="month-year" id="monthYear"></div>
+            <div class="current-time" id="currentTime"></div>
+        </div>
+        <table>
+            <tr>
+                <th>一</th>
+                <th>二</th>
+                <th>三</th>
+                <th>四</th>
+                <th>五</th>
+                <th>六</th>
+                <th>日</th>
+            </tr>
+            <tbody id="calendarBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // 从URL参数获取颜色值
+        const urlParams = new URLSearchParams(window.location.search);
+        const highlightColor = urlParams.get('color') || '#e6f3ff';
+        document.documentElement.style.setProperty('--highlight-color', highlightColor);
+
+        function updateTime() {
+            const options = {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+                timeZone: 'Asia/Shanghai'
+            };
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', options);
+            document.getElementById('currentTime').textContent = timeString
+                .replace(/(:\d+)|(AM|PM)/, ' $2')
+                .trim();
+        }
+
+        function generateCalendar() {
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const year = today.getFullYear();
+            
+            // 设置月份显示
+            const monthDisplay = `${year}-${String(currentMonth + 1).padStart(2, '0')}`;
+            document.getElementById('monthYear').textContent = monthDisplay;
+
+            // 获取当月第一天和最后一天
+            const firstDay = new Date(year, currentMonth, 1);
+            const lastDay = new Date(year, currentMonth + 1, 0);
+            
+            // 计算当前周范围
+            const currentWeekStart = new Date(today);
+            currentWeekStart.setDate(today.getDate() - (today.getDay() === 0 ? 6 : today.getDay() - 1));
+            currentWeekStart.setHours(0,0,0,0);
+            
+            const currentWeekEnd = new Date(currentWeekStart);
+            currentWeekEnd.setDate(currentWeekStart.getDate() + 6);
+            currentWeekEnd.setHours(23,59,59,999);
+
+            // 生成日历表格
+            let calendarHTML = '';
+            let date = new Date(firstDay);
+            date.setDate(1 - (firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1));
+            
+            for (let i = 0; i < 6; i++) {
+                calendarHTML += '<tr>';
+                for (let j = 0; j < 7; j++) {
+                    const currentDate = new Date(date);
+                    const isCurrentMonth = currentDate.getMonth() === currentMonth;
+                    const isCurrentWeek = currentDate >= currentWeekStart && currentDate <= currentWeekEnd;
+                    
+                    calendarHTML += `
+                        <td class="${isCurrentWeek ? 'current-week' : ''} ${!isCurrentMonth ? 'other-month' : ''}">
+                            ${currentDate.getDate()}
+                        </td>
+                    `;
+                    date.setDate(date.getDate() + 1);
+                }
+                calendarHTML += '</tr>';
+                if (date > lastDay) break;
+            }
+
+            document.getElementById('calendarBody').innerHTML = calendarHTML;
+        }
+
+        // 初始化
+        window.onload = () => {
+            generateCalendar();
+            updateTime();
+            setInterval(updateTime, 1000);
+        };
+    </script>
+</body>
+</html>
