@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>2024-2026日历@是小懒同学</title>
+  <title>2024-2026日历</title>
   <style>
     :root {
       --primary-color: #5D4037; /* 默认主题色 */
@@ -161,6 +161,7 @@
       text-align: center;
       flex-grow: 1;
       margin: 0 4vw; /* 使用视口宽度百分比作为边距 */
+      cursor: pointer;
     }
     
     /* 中等屏幕调整年月字体大小 */
@@ -392,7 +393,7 @@
       100% { transform: scale(1); opacity: 0.9; }
     }
 
-    /* 颜色选择器面板 */
+    /* 颜色选择器面板 - 增强自适应 */
     .color-picker-panel {
       position: fixed;
       top: 0;
@@ -407,6 +408,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s;
+      padding: 20px; /* 添加内边距，避免在小屏幕下与边缘贴合 */
     }
 
     .color-picker-panel.active {
@@ -417,12 +419,14 @@
     .color-picker-content {
       background: white;
       border-radius: 10px;
-      padding: 20px;
-      width: 90%;
-      max-width: 350px;
+      padding: 5vw; /* 使用视口单位作为内边距 */
+      width: 90%; /* 相对视口宽度的百分比 */
+      max-width: 350px; /* 最大宽度限制 */
       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
       transform: scale(0.9);
       transition: transform 0.3s;
+      max-height: 90vh; /* 最大高度限制 */
+      overflow-y: auto; /* 超出高度时显示滚动条 */
     }
 
     .color-picker-panel.active .color-picker-content {
@@ -433,16 +437,16 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 4vw; /* 使用视口单位作为边距 */
     }
 
     .color-picker-header h3 {
-      font-size: 18px;
+      font-size: 4.5vw; /* 使用视口单位作为字体大小 */
       color: #333;
     }
 
     .close-btn {
-      font-size: 24px;
+      font-size: 6vw; /* 使用视口单位作为字体大小 */
       cursor: pointer;
       color: #666;
       transition: color 0.2s;
@@ -454,53 +458,55 @@
 
     .color-option {
       display: flex;
-      align-items: center;
-      margin-bottom: 15px;
+      flex-direction: column; /* 在小屏幕下垂直排列 */
+      align-items: flex-start;
+      margin-bottom: 4vw; /* 使用视口单位作为边距 */
     }
 
     .color-option label {
-      width: 80px;
-      font-size: 14px;
+      width: 100%; /* 标签宽度占满容器 */
+      font-size: 3.5vw; /* 使用视口单位作为字体大小 */
       color: #333;
+      margin-bottom: 2vw; /* 标签与输入组之间的间距 */
     }
 
     .color-input-group {
       display: flex;
       align-items: center;
-      flex-grow: 1;
+      width: 100%; /* 输入组宽度占满容器 */
     }
 
     .color-preview {
-      width: 30px;
-      height: 30px;
+      width: 8vw; /* 使用视口单位作为宽度 */
+      height: 8vw; /* 使用视口单位作为高度 */
       border-radius: 4px;
-      margin-right: 10px;
+      margin-right: 3vw; /* 使用视口单位作为边距 */
       border: 1px solid #ddd;
     }
 
     .color-input {
       flex-grow: 1;
-      height: 30px;
-      padding: 5px 10px;
+      height: 8vw; /* 使用视口单位作为高度 */
+      padding: 0 3vw; /* 使用视口单位作为内边距 */
       border: 1px solid #ddd;
       border-radius: 4px;
-      font-size: 14px;
+      font-size: 3.5vw; /* 使用视口单位作为字体大小 */
       text-transform: uppercase;
     }
 
     .color-buttons {
       display: flex;
       justify-content: flex-end;
-      margin-top: 20px;
+      margin-top: 4vw; /* 使用视口单位作为边距 */
     }
 
     .color-btn {
-      padding: 8px 15px;
+      padding: 2vw 4vw; /* 使用视口单位作为内边距 */
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 14px;
-      margin-left: 10px;
+      font-size: 3.5vw; /* 使用视口单位作为字体大小 */
+      margin-left: 3vw; /* 使用视口单位作为边距 */
       transition: background 0.2s;
     }
 
@@ -521,13 +527,137 @@
     .apply-btn:hover {
       background: rgba(93, 64, 55, 0.9);
     }
+
+    /* 响应式调整 - 中等屏幕 */
+    @media (min-width: 576px) {
+      .color-picker-content {
+        padding: 3vw;
+      }
+      
+      .color-picker-header h3 {
+        font-size: 3vw;
+      }
+      
+      .close-btn {
+        font-size: 4vw;
+      }
+      
+      .color-option {
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 3vw;
+      }
+      
+      .color-option label {
+        width: 25%;
+        font-size: 2.5vw;
+        margin-bottom: 0;
+      }
+      
+      .color-preview {
+        width: 6vw;
+        height: 6vw;
+        margin-right: 2vw;
+      }
+      
+      .color-input {
+        height: 6vw;
+        font-size: 2.5vw;
+      }
+      
+      .color-buttons {
+        margin-top: 3vw;
+      }
+      
+      .color-btn {
+        padding: 1.5vw 3vw;
+        font-size: 2.5vw;
+      }
+    }
+
+    /* 响应式调整 - 大屏幕 */
+    @media (min-width: 768px) {
+      .color-picker-header h3 {
+        font-size: 2.5vw;
+      }
+      
+      .close-btn {
+        font-size: 3.5vw;
+      }
+      
+      .color-option label {
+        font-size: 2vw;
+      }
+      
+      .color-preview {
+        width: 5vw;
+        height: 5vw;
+      }
+      
+      .color-input {
+        height: 5vw;
+        font-size: 2vw;
+      }
+      
+      .color-btn {
+        font-size: 2vw;
+      }
+    }
+
+    /* 响应式调整 - 桌面端 */
+    @media (min-width: 992px) {
+      .color-picker-content {
+        padding: 20px;
+      }
+      
+      .color-picker-header {
+        margin-bottom: 15px;
+      }
+      
+      .color-picker-header h3 {
+        font-size: 18px;
+      }
+      
+      .close-btn {
+        font-size: 24px;
+      }
+      
+      .color-option {
+        margin-bottom: 15px;
+      }
+      
+      .color-option label {
+        width: 80px;
+        font-size: 14px;
+      }
+      
+      .color-preview {
+        width: 30px;
+        height: 30px;
+        margin-right: 10px;
+      }
+      
+      .color-input {
+        height: 30px;
+        font-size: 14px;
+      }
+      
+      .color-buttons {
+        margin-top: 20px;
+      }
+      
+      .color-btn {
+        padding: 8px 15px;
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="calendar">
-    <div class="calendar-header" id="theme-toggle">
+    <div class="calendar-header">
       <button id="prev-btn"></button>
-      <h2 id="month-year"></h2>
+      <h2 id="month-year" class="theme-toggle"></h2>
       <button id="next-btn"></button>
     </div>
     <div class="weekdays">
@@ -579,7 +709,7 @@
     
     // 颜色选择器相关元素
     const colorPicker = document.getElementById('color-picker');
-    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggle = document.querySelector('.theme-toggle');
     const closeColorPicker = document.getElementById('close-color-picker');
     const primaryColorInput = document.getElementById('primary-color');
     const bgColorInput = document.getElementById('bg-color');
@@ -881,5 +1011,4 @@
     renderCalendar();
   </script>
 </body>
-</html>
-  
+</html>    
