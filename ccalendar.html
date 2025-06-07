@@ -11,15 +11,38 @@
       --text-color: #000000; /* 文本颜色 */
       --holiday-color: rgba(93, 64, 55, 0.8); /* 节假日颜色改为主题色透明度0.8 */
       --workday-color: #FF0000; /* 补班颜色改为红色 */
-      --circle-size: 75%; /* 圆形大小调整为75% */
-      --day-gap: 3px; /* 日期间距增加到3px */
-      --bottom-spacing: 10px; /* 底部间距 */
+      --day-gap: 0.7vw; /* 使用视口宽度百分比作为日期间距 */
+      --bottom-spacing: 2.4vw; /* 使用视口宽度百分比作为底部间距 */
+      --base-font-size: 4vw; /* 基础字体大小，随屏幕尺寸变化 */
     }
+    
+    /* 不同屏幕尺寸的基础设置 */
+    @media (min-width: 576px) {
+      :root {
+        --base-font-size: 2.5vw; /* 中等屏幕减小字体大小 */
+      }
+    }
+    
+    @media (min-width: 768px) {
+      :root {
+        --base-font-size: 1.8vw; /* 大屏幕进一步减小字体大小 */
+      }
+    }
+    
+    @media (min-width: 992px) {
+      :root {
+        --base-font-size: 16px; /* 桌面端固定字体大小 */
+        --day-gap: 3px; /* 桌面端固定日期间距 */
+        --bottom-spacing: 10px; /* 桌面端固定底部间距 */
+      }
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+    
     body {
       font-family: Arial, sans-serif;
       background: #f5f5f5;
@@ -27,49 +50,86 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding: 2vw; /* 使用视口宽度百分比作为页面边距 */
     }
+
     .calendar {
-      width: 420px; /* 宽度增加到420px */
-      height: 480px; /* 高度增加到480px */
+      width: 96vw; /* 使用视口宽度百分比作为日历宽度 */
+      max-width: 420px; /* 最大宽度限制 */
+      aspect-ratio: 7/8; /* 固定宽高比 */
       background: var(--bg-color);
-      border-radius: 12px;
+      border-radius: 3vw; /* 使用视口宽度百分比作为圆角半径 */
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
+
     .calendar-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 16px;
+      padding: 3vw 4vw; /* 使用视口宽度百分比作为内边距 */
       background: var(--primary-color);
       color: #fff;
+      cursor: pointer;
+      position: relative;
     }
+
     .calendar-header button {
       background: transparent;
       border: none;
       color: #fff;
-      font-size: 18px;
+      font-size: 4.5vw; /* 使用视口宽度百分比作为字体大小 */
       cursor: pointer;
-      padding: 8px;
+      padding: 2vw; /* 使用视口宽度百分比作为内边距 */
       transition: all 0.3s;
-      width: 36px;
-      height: 36px;
+      width: 9vw; /* 使用视口宽度百分比作为宽度 */
+      height: 9vw; /* 使用视口宽度百分比作为高度 */
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
     }
+    
+    /* 中等屏幕调整按钮大小 */
+    @media (min-width: 576px) {
+      .calendar-header button {
+        font-size: 3.5vw;
+        width: 7vw;
+        height: 7vw;
+      }
+    }
+    
+    /* 大屏幕调整按钮大小 */
+    @media (min-width: 768px) {
+      .calendar-header button {
+        font-size: 2.8vw;
+        width: 6vw;
+        height: 6vw;
+      }
+    }
+    
+    /* 桌面端固定按钮大小 */
+    @media (min-width: 992px) {
+      .calendar-header button {
+        font-size: 18px;
+        width: 36px;
+        height: 36px;
+        padding: 8px;
+      }
+    }
+
     .calendar-header button:hover {
       background: rgba(255,255,255,0.2);
       border-radius: 50%;
     }
-    /* 自定义箭头样式 - 60度角度 */
+
+    /* 自定义箭头样式 */
     #prev-btn::before, #next-btn::before {
       content: '';
-      width: 10px;
-      height: 10px;
-      border-width: 2px 2px 0 0;
+      width: 2.4vw; /* 使用视口宽度百分比作为箭头大小 */
+      height: 2.4vw; /* 使用视口宽度百分比作为箭头大小 */
+      border-width: 0.5vw 0.5vw 0 0; /* 使用视口宽度百分比作为边框宽度 */
       border-style: solid;
       border-color: #fff;
       position: absolute;
@@ -77,99 +137,198 @@
       left: 50%;
       transform-origin: center;
     }
+    
+    /* 桌面端固定箭头大小 */
+    @media (min-width: 992px) {
+      #prev-btn::before, #next-btn::before {
+        width: 10px;
+        height: 10px;
+        border-width: 2px 2px 0 0;
+      }
+    }
+
     #prev-btn::before {
       transform: translate(-35%, -50%) rotate(-135deg);
     }
+
     #next-btn::before {
       transform: translate(-65%, -50%) rotate(45deg);
     }
+
     #month-year {
-      font-size: 20px; /* 年月字号加大到20px */
+      font-size: 4.8vw; /* 使用视口宽度百分比作为字体大小 */
       font-weight: 700; /* 字体加粗 */
       text-align: center;
       flex-grow: 1;
-      margin: 0 16px;
+      margin: 0 4vw; /* 使用视口宽度百分比作为边距 */
     }
+    
+    /* 中等屏幕调整年月字体大小 */
+    @media (min-width: 576px) {
+      #month-year {
+        font-size: 3.8vw;
+      }
+    }
+    
+    /* 大屏幕调整年月字体大小 */
+    @media (min-width: 768px) {
+      #month-year {
+        font-size: 3vw;
+      }
+    }
+    
+    /* 桌面端固定年月字体大小 */
+    @media (min-width: 992px) {
+      #month-year {
+        font-size: 20px;
+        margin: 0 16px;
+      }
+    }
+
     /* 星期栏 */
     .weekdays {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       background: var(--bg-color);
-      padding: 8px 0;
-      margin: 0 4px;
+      padding: 2vw 0; /* 使用视口宽度百分比作为内边距 */
+      margin: 0 1vw; /* 使用视口宽度百分比作为边距 */
     }
+
     .weekdays div {
       text-align: center;
       color: var(--text-color);
       font-weight: 700;
-      font-size: 16px;
-      padding: 6px 0;
+      font-size: 3.5vw; /* 使用视口宽度百分比作为字体大小 */
+      padding: 1.5vw 0; /* 使用视口宽度百分比作为内边距 */
     }
+    
+    /* 中等屏幕调整星期栏字体大小 */
+    @media (min-width: 576px) {
+      .weekdays div {
+        font-size: 2.8vw;
+      }
+    }
+    
+    /* 大屏幕调整星期栏字体大小 */
+    @media (min-width: 768px) {
+      .weekdays div {
+        font-size: 2vw;
+      }
+    }
+    
+    /* 桌面端固定星期栏字体大小 */
+    @media (min-width: 992px) {
+      .weekdays div {
+        font-size: 16px;
+        padding: 6px 0;
+      }
+    }
+
     /* 日期容器 */
     .days {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       grid-auto-rows: minmax(0, 1fr);
-      padding: 4px 4px var(--bottom-spacing) 4px;
+      padding: 1vw 1vw var(--bottom-spacing) 1vw; /* 使用视口宽度百分比作为内边距 */
       background: var(--bg-color);
       gap: var(--day-gap);
       flex-grow: 1;
     }
+
     .day {
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 16px;
+      font-size: 3.8vw; /* 使用视口宽度百分比作为字体大小 */
       font-weight: 700;
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
       aspect-ratio: 1 / 1;
       position: relative;
     }
+    
+    /* 中等屏幕调整日期字体大小 */
+    @media (min-width: 576px) {
+      .day {
+        font-size: 3vw;
+      }
+    }
+    
+    /* 大屏幕调整日期字体大小 */
+    @media (min-width: 768px) {
+      .day {
+        font-size: 2.2vw;
+      }
+    }
+    
+    /* 桌面端固定日期字体大小 */
+    @media (min-width: 992px) {
+      .day {
+        font-size: 16px;
+      }
+    }
+
     /* 为最后一列添加额外的右边距 */
     .day:nth-child(7n) {
-      padding-right: 4px;
+      padding-right: 1vw; /* 使用视口宽度百分比作为边距 */
     }
+    
+    /* 桌面端固定最后一列右边距 */
+    @media (min-width: 992px) {
+      .day:nth-child(7n) {
+        padding-right: 4px;
+      }
+    }
+
     .day.other-month {
       color: rgba(0, 0, 0, 0.3);
       font-weight: 400;
     }
+
     .day.holiday:not(.other-month) {
       color: var(--holiday-color);
     }
+
     .day.holiday.other-month {
       color: rgba(93, 64, 55, 0.5); /* 上下月节假日使用更浅的颜色 */
     }
+
     .day.workday:not(.other-month) {
       color: var(--text-color); /* 补班日的数字使用正常颜色 */
     }
+
     .day.workday.other-month {
       color: rgba(0, 0, 0, 0.3); /* 上下月补班使用更浅的颜色 */
     }
+
     .day:not(.other-month) {
       color: var(--text-color);
     }
+
     .day.today::before,
     .day.selected::before,
     .day:not(.today):not(.selected):hover::before {
       content: '';
       position: absolute;
-      width: var(--circle-size);
-      height: var(--circle-size);
+      width: 80%; /* 使用百分比作为圆形大小 */
+      height: 80%; /* 使用百分比作为圆形大小 */
       background: var(--primary-color);
       border-radius: 50%;
       z-index: 0;
       opacity: 0;
       transition: opacity 0.2s;
     }
+
     .day.today::before {
       opacity: 1;
       animation: breathe 2s infinite ease-in-out;
     }
+
     .day.selected::before,
     .day:not(.today):not(.selected):hover::before {
       opacity: 0.8;
     }
+
     .day.today span,
     .day.selected span,
     .day:not(.today):not(.selected):hover span {
@@ -177,20 +336,47 @@
       z-index: 1;
       color: #fff;
     }
+
     .holiday-mark, .workday-mark {
       position: absolute;
-      top: 2px;
-      right: 2px;
-      font-size: 10px;
+      top: 0.5vw; /* 使用视口宽度百分比作为定位 */
+      right: 0.5vw; /* 使用视口宽度百分比作为定位 */
+      font-size: 2.2vw; /* 使用视口宽度百分比作为字体大小 */
       font-weight: bold;
       z-index: 1;
     }
+    
+    /* 中等屏幕调整标记字体大小 */
+    @media (min-width: 576px) {
+      .holiday-mark, .workday-mark {
+        font-size: 1.8vw;
+      }
+    }
+    
+    /* 大屏幕调整标记字体大小 */
+    @media (min-width: 768px) {
+      .holiday-mark, .workday-mark {
+        font-size: 1.4vw;
+      }
+    }
+    
+    /* 桌面端固定标记字体大小 */
+    @media (min-width: 992px) {
+      .holiday-mark, .workday-mark {
+        font-size: 10px;
+        top: 2px;
+        right: 2px;
+      }
+    }
+
     .holiday-mark {
       color: var(--holiday-color); /* 使用主题色透明度0.8 */
     }
+
     .workday-mark {
       color: var(--workday-color); /* 补班标记颜色改为红色 */
     }
+
     .day.today .holiday-mark,
     .day.selected .holiday-mark,
     .day:not(.today):not(.selected):hover .holiday-mark,
@@ -199,16 +385,147 @@
     .day:not(.today):not(.selected):hover .workday-mark {
       color: white; /* 今日、选中和悬停状态下显示为白色 */
     }
+
     @keyframes breathe {
       0% { transform: scale(1); opacity: 0.9; }
       50% { transform: scale(1.05); opacity: 0.6; }
       100% { transform: scale(1); opacity: 0.9; }
     }
+
+    /* 颜色选择器面板 */
+    .color-picker-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .color-picker-panel.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .color-picker-content {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      width: 90%;
+      max-width: 350px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      transform: scale(0.9);
+      transition: transform 0.3s;
+    }
+
+    .color-picker-panel.active .color-picker-content {
+      transform: scale(1);
+    }
+
+    .color-picker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .color-picker-header h3 {
+      font-size: 18px;
+      color: #333;
+    }
+
+    .close-btn {
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+      transition: color 0.2s;
+    }
+
+    .close-btn:hover {
+      color: #333;
+    }
+
+    .color-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .color-option label {
+      width: 80px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .color-input-group {
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+    }
+
+    .color-preview {
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      margin-right: 10px;
+      border: 1px solid #ddd;
+    }
+
+    .color-input {
+      flex-grow: 1;
+      height: 30px;
+      padding: 5px 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+
+    .color-buttons {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .color-btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 10px;
+      transition: background 0.2s;
+    }
+
+    .reset-btn {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .reset-btn:hover {
+      background: #e0e0e0;
+    }
+
+    .apply-btn {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .apply-btn:hover {
+      background: rgba(93, 64, 55, 0.9);
+    }
   </style>
 </head>
 <body>
   <div class="calendar">
-    <div class="calendar-header">
+    <div class="calendar-header" id="theme-toggle">
       <button id="prev-btn"></button>
       <h2 id="month-year"></h2>
       <button id="next-btn"></button>
@@ -219,12 +536,106 @@
     <div class="days" id="days-container"></div>
   </div>
 
+  <!-- 颜色选择器面板 -->
+  <div class="color-picker-panel" id="color-picker">
+    <div class="color-picker-content">
+      <div class="color-picker-header">
+        <h3>自定义颜色主题</h3>
+        <span class="close-btn" id="close-color-picker">&times;</span>
+      </div>
+      <div class="color-option">
+        <label>主题色:</label>
+        <div class="color-input-group">
+          <div class="color-preview" id="primary-preview"></div>
+          <input type="text" class="color-input" id="primary-color" placeholder="#5D4037">
+        </div>
+      </div>
+      <div class="color-option">
+        <label>背景色:</label>
+        <div class="color-input-group">
+          <div class="color-preview" id="bg-preview"></div>
+          <input type="text" class="color-input" id="bg-color" placeholder="#EFEBE9">
+        </div>
+      </div>
+      <div class="color-option">
+        <label>文本色:</label>
+        <div class="color-input-group">
+          <div class="color-preview" id="text-preview"></div>
+          <input type="text" class="color-input" id="text-color" placeholder="#000000">
+        </div>
+      </div>
+      <div class="color-buttons">
+        <button class="color-btn reset-btn" id="reset-colors">重置</button>
+        <button class="color-btn apply-btn" id="apply-colors">应用</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // 今日日期：2025年6月7日
     const today = new Date(2025, 5, 7);
     let currentYear = today.getFullYear();
     let currentMonth = today.getMonth();
-
+    
+    // 颜色选择器相关元素
+    const colorPicker = document.getElementById('color-picker');
+    const themeToggle = document.getElementById('theme-toggle');
+    const closeColorPicker = document.getElementById('close-color-picker');
+    const primaryColorInput = document.getElementById('primary-color');
+    const bgColorInput = document.getElementById('bg-color');
+    const textColorInput = document.getElementById('text-color');
+    const primaryPreview = document.getElementById('primary-preview');
+    const bgPreview = document.getElementById('bg-preview');
+    const textPreview = document.getElementById('text-preview');
+    const applyColorsBtn = document.getElementById('apply-colors');
+    const resetColorsBtn = document.getElementById('reset-colors');
+    
+    // 默认颜色值
+    const defaultColors = {
+      primary: '#5D4037',
+      bg: '#EFEBE9',
+      text: '#000000'
+    };
+    
+    // 初始化颜色输入框
+    function initColorInputs() {
+      // 尝试从本地存储获取颜色设置
+      const savedColors = JSON.parse(localStorage.getItem('calendarTheme')) || defaultColors;
+      
+      // 设置输入框值和预览颜色
+      primaryColorInput.value = savedColors.primary;
+      bgColorInput.value = savedColors.bg;
+      textColorInput.value = savedColors.text;
+      
+      updateColorPreviews();
+      
+      // 应用保存的颜色
+      applyColors(savedColors);
+    }
+    
+    // 更新颜色预览
+    function updateColorPreviews() {
+      primaryPreview.style.backgroundColor = primaryColorInput.value;
+      bgPreview.style.backgroundColor = bgColorInput.value;
+      textPreview.style.backgroundColor = textColorInput.value;
+    }
+    
+    // 应用颜色
+    function applyColors(colors) {
+      document.documentElement.style.setProperty('--primary-color', colors.primary);
+      document.documentElement.style.setProperty('--bg-color', colors.bg);
+      document.documentElement.style.setProperty('--text-color', colors.text);
+      
+      // 更新应用按钮颜色
+      applyColorsBtn.style.backgroundColor = colors.primary;
+      
+      // 保存到本地存储
+      localStorage.setItem('calendarTheme', JSON.stringify(colors));
+      
+      // 刷新日历以应用新颜色
+      renderCalendar();
+    }
+    
     // 2024-2026年中国节假日数据（日期格式：YYYY-MM-DD）
     const holidays = [
       // 2024年节假日
@@ -414,8 +825,61 @@
       renderCalendar();
     });
 
+    // 窗口大小变化时重新渲染日历
+    window.addEventListener('resize', renderCalendar);
+    
+    // 颜色选择器事件处理
+    themeToggle.addEventListener('click', () => {
+      colorPicker.classList.add('active');
+    });
+    
+    closeColorPicker.addEventListener('click', () => {
+      colorPicker.classList.remove('active');
+    });
+    
+    // 点击面板外部关闭
+    colorPicker.addEventListener('click', (e) => {
+      if (e.target === colorPicker) {
+        colorPicker.classList.remove('active');
+      }
+    });
+    
+    // 颜色输入变化时更新预览
+    primaryColorInput.addEventListener('input', updateColorPreviews);
+    bgColorInput.addEventListener('input', updateColorPreviews);
+    textColorInput.addEventListener('input', updateColorPreviews);
+    
+    // 应用颜色
+    applyColorsBtn.addEventListener('click', () => {
+      const colors = {
+        primary: primaryColorInput.value,
+        bg: bgColorInput.value,
+        text: textColorInput.value
+      };
+      
+      // 简单验证色值格式
+      const isValidColor = (color) => /^#[0-9A-F]{6}$/i.test(color);
+      
+      if (isValidColor(colors.primary) && isValidColor(colors.bg) && isValidColor(colors.text)) {
+        applyColors(colors);
+        colorPicker.classList.remove('active');
+      } else {
+        alert('请输入有效的十六进制颜色值（例如：#FF0000）');
+      }
+    });
+    
+    // 重置颜色
+    resetColorsBtn.addEventListener('click', () => {
+      primaryColorInput.value = defaultColors.primary;
+      bgColorInput.value = defaultColors.bg;
+      textColorInput.value = defaultColors.text;
+      updateColorPreviews();
+    });
+
     // 初始化
+    initColorInputs();
     renderCalendar();
   </script>
 </body>
 </html>
+  
