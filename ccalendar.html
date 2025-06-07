@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>2025日历</title>
+  <title>2024-2026日历</title>
   <style>
     :root {
       --primary-color: #5D4037; /* 默认主题色 */
       --bg-color: #EFEBE9; /* 默认背景色 */
       --text-color: #000000; /* 文本颜色 */
-      --circle-size: 72%; /* 圆形大小调整为72% */
-      --day-gap: 2px; /* 日期间距 */
-      --bottom-spacing: 20px; /* 底部间距 */
+      --holiday-color: rgba(93, 64, 55, 0.8); /* 节假日颜色改为主题色透明度0.8 */
+      --workday-color: #FF0000; /* 补班颜色改为红色 */
+      --circle-size: 75%; /* 圆形大小调整为75% */
+      --day-gap: 3px; /* 日期间距增加到3px */
+      --bottom-spacing: 10px; /* 底部间距 */
     }
     * {
       margin: 0;
@@ -27,8 +29,8 @@
       min-height: 100vh;
     }
     .calendar {
-      width: 360px;
-      height: 368px; /* 高度增加8px */
+      width: 420px; /* 宽度增加到420px */
+      height: 480px; /* 高度增加到480px */
       background: var(--bg-color);
       border-radius: 12px;
       overflow: hidden;
@@ -82,8 +84,8 @@
       transform: translate(-65%, -50%) rotate(45deg);
     }
     #month-year {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 20px; /* 年月字号加大到20px */
+      font-weight: 700; /* 字体加粗 */
       text-align: center;
       flex-grow: 1;
       margin: 0 16px;
@@ -108,10 +110,10 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       grid-auto-rows: minmax(0, 1fr);
-      padding: 4px 4px var(--bottom-spacing) 4px; /* 使用变量控制底部间距 */
+      padding: 4px 4px var(--bottom-spacing) 4px;
       background: var(--bg-color);
-      gap: var(--day-gap); /* 使用变量控制间距 */
-      flex-grow: 1; /* 让日期容器占据剩余空间 */
+      gap: var(--day-gap);
+      flex-grow: 1;
     }
     .day {
       display: flex;
@@ -124,9 +126,25 @@
       aspect-ratio: 1 / 1;
       position: relative;
     }
+    /* 为最后一列添加额外的右边距 */
+    .day:nth-child(7n) {
+      padding-right: 4px;
+    }
     .day.other-month {
       color: rgba(0, 0, 0, 0.3);
       font-weight: 400;
+    }
+    .day.holiday:not(.other-month) {
+      color: var(--holiday-color);
+    }
+    .day.holiday.other-month {
+      color: rgba(93, 64, 55, 0.5); /* 上下月节假日使用更浅的颜色 */
+    }
+    .day.workday:not(.other-month) {
+      color: var(--text-color); /* 补班日的数字使用正常颜色 */
+    }
+    .day.workday.other-month {
+      color: rgba(0, 0, 0, 0.3); /* 上下月补班使用更浅的颜色 */
     }
     .day:not(.other-month) {
       color: var(--text-color);
@@ -150,7 +168,7 @@
     }
     .day.selected::before,
     .day:not(.today):not(.selected):hover::before {
-      opacity: 0.8; /* 悬浮和选中状态的透明度 */
+      opacity: 0.8;
     }
     .day.today span,
     .day.selected span,
@@ -158,6 +176,28 @@
       position: relative;
       z-index: 1;
       color: #fff;
+    }
+    .holiday-mark, .workday-mark {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      font-size: 10px;
+      font-weight: bold;
+      z-index: 1;
+    }
+    .holiday-mark {
+      color: var(--holiday-color); /* 使用主题色透明度0.8 */
+    }
+    .workday-mark {
+      color: var(--workday-color); /* 补班标记颜色改为红色 */
+    }
+    .day.today .holiday-mark,
+    .day.selected .holiday-mark,
+    .day:not(.today):not(.selected):hover .holiday-mark,
+    .day.today .workday-mark,
+    .day.selected .workday-mark,
+    .day:not(.today):not(.selected):hover .workday-mark {
+      color: white; /* 今日、选中和悬停状态下显示为白色 */
     }
     @keyframes breathe {
       0% { transform: scale(1); opacity: 0.9; }
@@ -185,6 +225,60 @@
     let currentYear = today.getFullYear();
     let currentMonth = today.getMonth();
 
+    // 2024-2026年中国节假日数据（日期格式：YYYY-MM-DD）
+    const holidays = [
+      // 2024年节假日
+      '2024-01-01', // 元旦
+      '2024-02-10', '2024-02-11', '2024-02-12', '2024-02-13', '2024-02-14', '2024-02-15', '2024-02-16', // 春节
+      '2024-04-04', // 清明节
+      '2024-05-01', '2024-05-02', '2024-05-03', '2024-05-04', // 劳动节
+      '2024-06-08', '2024-06-09', '2024-06-10', // 端午节
+      '2024-09-15', '2024-09-16', // 中秋节
+      '2024-10-01', '2024-10-02', '2024-10-03', '2024-10-04', '2024-10-05', '2024-10-06', // 国庆节
+      
+      // 2025年节假日
+      '2025-01-01', // 元旦（1天）
+      '2025-01-28', '2025-01-29', '2025-01-30', '2025-01-31', // 春节（除夕-初三）
+      '2025-02-01', '2025-02-02', '2025-02-03', '2025-02-04', // 春节（初四-初七）
+      '2025-04-04', '2025-04-05', '2025-04-06', // 清明节（3天）
+      '2025-05-01', '2025-05-02', '2025-05-03', '2025-05-04', '2025-05-05', // 劳动节（5天）
+      '2025-05-31', '2025-06-01', '2025-06-02', // 端午节（3天）
+      '2025-10-01', '2025-10-02', '2025-10-03', '2025-10-04', // 国庆节+中秋节（合并假期）
+      '2025-10-05', '2025-10-06', '2025-10-07', '2025-10-08' // 国庆节+中秋节（合并假期）
+      
+      // 2026年法定节假日（预测版）
+      '2026-01-01', '2026-01-02', '2026-01-03', // 元旦（1月1日周四-1月3日周六）
+      '2026-02-16', '2026-02-17', '2026-02-18', '2026-02-19', // 春节（除夕2月16日周一-正月初三）
+      '2026-02-20', '2026-02-21', '2026-02-22', '2026-02-23', // 春节（正月初四-初七）
+      '2026-04-04', '2026-04-05', '2026-04-06', // 清明节（4月4日周六-4月6日周一）
+      '2026-05-01', '2026-05-02', '2026-05-03', '2026-05-04', '2026-05-05', // 劳动节（5月1日周五-5月5日周二）
+      '2026-06-19', '2026-06-20', '2026-06-21', // 端午节（6月19日周五-6月21日周日）
+      '2026-09-25', '2026-09-26', '2026-09-27', // 中秋节（9月25日周五-9月27日周日）
+      '2026-10-01', '2026-10-02', '2026-10-03', '2026-10-04', // 国庆节（10月1日周四-10月7日周三）
+      '2026-10-05', '2026-10-06', '2026-10-07' // 国庆节（续）
+
+    // 2024-2026年补班数据（日期格式：YYYY-MM-DD）
+    const workdays = [
+      // 2024年补班
+      '2024-02-04', '2024-02-18', // 春节补班
+      '2024-04-28', '2024-05-11', // 劳动节补班
+      '2024-10-12', '2024-10-13', // 国庆节补班
+      
+      // 2025年调休补班日
+      '2025-01-26', // 周日（春节调休）
+      '2025-02-08', // 周六（春节调休）
+      '2025-04-27', // 周日（劳动节调休）
+      '2025-09-28', // 周日（国庆调休）
+      '2025-10-11'  // 周六（国庆调休）
+      
+      // 2026年调休补班日（预测）
+      '2026-01-04', // 周日（元旦调休）
+      '2026-02-14', '2026-02-15', // 周六、周日（春节调休）
+      '2026-05-09', // 周六（劳动节调休）
+      '2026-09-20', // 周日（国庆节调休）
+      '2026-10-10'  // 周六（国庆节调休）
+    ];
+
     const daysContainer = document.getElementById('days-container');
     const monthYearElem = document.getElementById('month-year');
     const prevBtn = document.getElementById('prev-btn');
@@ -194,6 +288,20 @@
       '01', '02', '03', '04', '05', '06',
       '07', '08', '09', '10', '11', '12'
     ];
+
+    // 判断是否为节假日
+    function isHoliday(year, month, day) {
+      // 格式化日期为 YYYY-MM-DD
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      return holidays.includes(dateStr);
+    }
+
+    // 判断是否为补班日
+    function isWorkday(year, month, day) {
+      // 格式化日期为 YYYY-MM-DD
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      return workdays.includes(dateStr);
+    }
 
     // 渲染日历
     function renderCalendar() {
@@ -208,6 +316,7 @@
 
       monthYearElem.textContent = `${currentYear} - ${months[currentMonth]}`;
 
+      // 生成6周共42天的日期
       for (let i = 0; i < 42; i++) {
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
@@ -238,6 +347,16 @@
           }
         }
 
+        // 检查是否为节假日或补班日
+        const isHol = isHoliday(year, month, date);
+        const isWork = isWorkday(year, month, date);
+        
+        if (isHol) {
+          dayDiv.classList.add('holiday');
+        } else if (isWork) {
+          dayDiv.classList.add('workday');
+        }
+
         if (year === today.getFullYear() && month === today.getMonth() && date === today.getDate()) {
           dayDiv.classList.add('today');
         }
@@ -245,6 +364,19 @@
         const span = document.createElement('span');
         span.textContent = date;
         dayDiv.appendChild(span);
+
+        // 如果是节假日，添加"休"字标记；如果是补班日，添加"班"字标记
+        if (isHol) {
+          const holidayMark = document.createElement('div');
+          holidayMark.classList.add('holiday-mark');
+          holidayMark.textContent = '休';
+          dayDiv.appendChild(holidayMark);
+        } else if (isWork) {
+          const workdayMark = document.createElement('div');
+          workdayMark.classList.add('workday-mark');
+          workdayMark.textContent = '班';
+          dayDiv.appendChild(workdayMark);
+        }
 
         if (!isCurrentMonth) {
           dayDiv.classList.add('other-month');
