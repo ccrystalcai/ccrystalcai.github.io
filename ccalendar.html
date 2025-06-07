@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>2025日历@是小懒同学</title>
+  <title>2025日历</title>
   <style>
     :root {
       --primary-color: #5D4037; /* 默认主题色 */
       --bg-color: #EFEBE9; /* 默认背景色 */
-      --text-color: #000000; /* 文本颜色改为黑色 */
+      --text-color: #000000; /* 文本颜色 */
       --circle-size: 70%; /* 圆形大小（今日/选中） */
-      --hover-circle-size: calc(var(--circle-size) + 2px); /* 悬浮圆形大小加2px */
-      --bottom-spacing: 10px; /* 底部间距 */
+      --day-gap: 2px; /* 日期间距 */
+      --bottom-spacing: 20px; /* 底部间距增加到20px（原12px+8px） */
     }
     * {
       margin: 0;
-      padding: 0 0 12px 0;
+      padding: 0;
       box-sizing: border-box;
     }
     body {
@@ -28,10 +28,12 @@
     }
     .calendar {
       width: 360px;
-      aspect-ratio: 1 / 1;
+      height: 368px; /* 高度增加8px */
       background: var(--bg-color);
       border-radius: 12px;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
     .calendar-header {
       display: flex;
@@ -74,10 +76,10 @@
       transform-origin: center;
     }
     #prev-btn::before {
-      transform: translate(-40%, -50%) rotate(-135deg);
+      transform: translate(-35%, -50%) rotate(-135deg);
     }
     #next-btn::before {
-      transform: translate(-60%, -50%) rotate(45deg);
+      transform: translate(-65%, -50%) rotate(45deg);
     }
     #month-year {
       font-size: 16px;
@@ -106,9 +108,10 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       grid-auto-rows: minmax(0, 1fr);
-      padding: 4px 4px var(--bottom-spacing) 4px; /* 增加底部间距 */
+      padding: 4px 4px var(--bottom-spacing) 4px; /* 使用变量控制底部间距 */
       background: var(--bg-color);
-      gap: 2px;
+      gap: var(--day-gap); /* 使用变量控制间距 */
+      flex-grow: 1; /* 让日期容器占据剩余空间 */
     }
     .day {
       display: flex;
@@ -129,7 +132,8 @@
       color: var(--text-color);
     }
     .day.today::before,
-    .day.selected::before {
+    .day.selected::before,
+    .day:not(.today):not(.selected):hover::before {
       content: '';
       position: absolute;
       width: var(--circle-size);
@@ -137,22 +141,16 @@
       background: var(--primary-color);
       border-radius: 50%;
       z-index: 0;
+      opacity: 0;
+      transition: opacity 0.2s;
     }
     .day.today::before {
-      animation: breathe 3s infinite ease-in-out;
+      opacity: 1;
+      animation: breathe 2s infinite ease-in-out;
     }
-    .day.selected::before {
-      opacity: 0.8;
-    }
+    .day.selected::before,
     .day:not(.today):not(.selected):hover::before {
-      content: '';
-      position: absolute;
-      width: var(--hover-circle-size); /* 悬浮圆形大小加2px */
-      height: var(--hover-circle-size);
-      background: var(--primary-color);
-      border-radius: 50%;
-      z-index: 0;
-      opacity: 0.6;
+      opacity: 0.8; /* 悬浮和选中状态的透明度 */
     }
     .day.today span,
     .day.selected span,
@@ -161,13 +159,9 @@
       z-index: 1;
       color: #fff;
     }
-    /* 今日日期不显示悬浮效果 */
-    .day.today:hover::before {
-      animation: breathe 3s infinite ease-in-out;
-    }
     @keyframes breathe {
       0% { transform: scale(1); opacity: 0.9; }
-      50% { transform: scale(1.03); opacity: 0.7; }
+      50% { transform: scale(1.05); opacity: 0.6; }
       100% { transform: scale(1); opacity: 0.9; }
     }
   </style>
@@ -200,35 +194,6 @@
       '01', '02', '03', '04', '05', '06',
       '07', '08', '09', '10', '11', '12'
     ];
-
-    // 解析URL参数以修改主题颜色
-    function parseUrlParams() {
-      const params = new URLSearchParams(window.location.search);
-      const color = params.get('color');
-      if (color) {
-        // 验证颜色格式
-        if (/^#[0-9A-F]{6}$/i.test(color)) {
-          document.documentElement.style.setProperty('--primary-color', color);
-          // 基于主色调计算背景色
-          const bgColor = lightenColor(color, 0.8);
-          document.documentElement.style.setProperty('--bg-color', bgColor);
-        }
-      }
-    }
-
-    // 辅助函数：调亮颜色
-    function lightenColor(hex, percent) {
-      hex = hex.replace('#', '');
-      let r = parseInt(hex.substring(0, 2), 16);
-      let g = parseInt(hex.substring(2, 4), 16);
-      let b = parseInt(hex.substring(4, 6), 16);
-      
-      r = Math.min(255, Math.round(r * (1 + percent)));
-      g = Math.min(255, Math.round(g * (1 + percent)));
-      b = Math.min(255, Math.round(b * (1 + percent)));
-      
-      return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-    }
 
     // 渲染日历
     function renderCalendar() {
@@ -317,7 +282,6 @@
     });
 
     // 初始化
-    parseUrlParams();
     renderCalendar();
   </script>
 </body>
