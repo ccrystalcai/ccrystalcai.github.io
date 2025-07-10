@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>电影票根生成器</title>
+  <style>
+    /* 页面基础样式 */
+    body {
+      font-family: "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", "黑体", sans-serif;
+      background: #f8f4e9;
+      margin: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #6b4a2f;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+    
+    /* 表单样式 */
+    .form-section {
+      background: #ffffff;
+      padding: 25px;
+      border: 1px dashed #8c6b4d;
+      margin-bottom: 30px;
+      width: 620px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-radius: 6px;
+    }
+    .form-section label {
+      display: block;
+      margin: 12px 0 5px;
+      color: #6b4a2f;
+      font-weight: 500;
+      font-size: 16px;
+    }
+    .form-section input,
+    .form-section textarea {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #d9c8b8;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+    .form-section input:focus,
+    .form-section textarea:focus {
+      outline: none;
+      border-color: #a67c52;
+    }
+    .form-section button {
+      margin-top: 25px;
+      padding: 12px 25px;
+      background: #8c6b4d;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .form-section button:hover {
+      background-color: #7a5c40;
+    }
+
+    /* 票根容器样式 */
+    .ticket-container {
+      width: 620px;
+      background: #ffffff;
+      border: 2px solid #8c6b4d;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      display: flex;
+      padding: 18px;
+      box-sizing: border-box;
+      margin-bottom: 30px;
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    /* 海报区 */
+    .ticket-poster {
+      width: 200px;
+      height: 300px;
+      overflow: hidden;
+      border: 1px solid #d9c8b8;
+      margin-right: 22px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .ticket-poster img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* 信息区 */
+    .ticket-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .ticket-header {
+      margin-bottom: 12px;
+    }
+    .ticket-title-wrapper {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .ticket-title {
+      font-size: 26px;
+      color: #6b4a2f;
+      font-weight: bold;
+      margin: 0;
+      flex-grow: 1;
+      font-family: 站酷庆科黄油体", serif;
+      padding-left: 4px; /* 关键调整：与meta-label对齐 */
+    }
+    .ticket-rating {
+      color: #e69f00;
+      font-size: 19px;
+      margin-left: 8px;
+    }
+    .ticket-title-dash {
+      width: 100%;
+      border-bottom: 1px dashed #8c6b4d;
+      margin-bottom: 12px;
+    }
+    .ticket-meta {
+      color: #666;
+      line-height: 1.8;
+      margin-top: 12px;
+      font-size: 15px;
+    }
+    .meta-item {
+      display: flex;
+      margin-bottom: 8px;
+    }
+    .meta-label {
+      width: 70px;
+      text-align: right;
+      padding-right: 8px;
+      color: #444;
+      font-weight: 500;
+    }
+    .ticket-summary {
+      line-height: 1.8;
+      color: #333;
+      margin-top: 12px;
+      white-space: pre-wrap;
+      font-size: clamp(14px, 3vw, 18px);
+      font-family: "华文楷体", "楷体", "STKaiti", serif;
+      padding-left: 4px; /* 关键调整：与电影标题对齐 */
+    }
+    .ticket-summary-dash {
+      width: 100%;
+      border-bottom: 1px dashed #8c6b4d;
+      margin-top: 12px;
+    }
+    
+    /* 新增的上传区域样式 */
+    .upload-area {
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px dashed #d9c8b8;
+      text-align: center;
+      cursor: pointer;
+      background-color: #faf7f2;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    .upload-area:hover {
+      background-color: #f5f0e6;
+    }
+    .upload-area p {
+      margin: 6px 0;
+      color: #666;
+      font-size: 15px;
+    }
+    
+    /* 下载按钮样式 */
+    .download-btn {
+      padding: 10px 20px;
+      background: #e69f00;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      transition: background-color 0.2s;
+      margin-bottom: 20px;
+    }
+    .download-btn:hover {
+      background-color: #d49100;
+    }
+  </style>
+</head>
+<body>
+  <h1>电影票根生成器</h1>
+  
+  <!-- 输入表单 -->
+  <div class="form-section">
+    <label for="posterUrl">电影海报地址：</label>
+    <input type="url" id="posterUrl" placeholder="https://example.com/poster.jpg" />
+    
+    <div class="upload-area" id="uploadArea">
+      <p>或者上传本地图片</p>
+      <input type="file" id="posterFile" accept="image/*" style="display: none;">
+    </div>
+    
+    <label for="movieTitle">电影标题：</label>
+    <input type="text" id="movieTitle" placeholder="出不去的房间" required />
+    
+    <label for="releaseDate">上映时间：</label>
+    <input type="text" id="releaseDate" placeholder="2024年12月07日" required />
+    
+    <label for="watchDate">观影时间：</label>
+    <input type="text" id="watchDate" placeholder="2025年6月15日" required />
+    
+    <label for="movieGenre">类型：</label>
+    <input type="text" id="movieGenre" placeholder="悬疑 / 惊悚" required />
+    
+    <label for="director">导演：</label>
+    <input type="text" id="director" placeholder="张三" />
+    
+    <label for="actors">主演：</label>
+    <input type="text" id="actors" placeholder="李四, 王五" />
+    
+    <label for="movieRating">评分（1-5星）：</label>
+    <input type="number" id="movieRating" min="1" max="5" value="4" required />
+    
+    <label for="movieSummary">一句话小结：</label>
+    <textarea id="movieSummary" rows="4" placeholder="密闭空间悬疑，反转与情感交织…" required></textarea>
+    
+    <button onclick="generateTicket()">生成票根</button>
+  </div>
+
+  <!-- 票根展示容器 -->
+  <div id="ticketDisplay"></div>
+  
+  <!-- 下载按钮 -->
+  <button id="downloadBtn" class="download-btn" onclick="downloadTicketAsImage()" disabled>
+    下载票根图片
+  </button>
+
+  <!-- html2canvas库 -->
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+  <script>
+    // 上传区域点击事件
+    document.getElementById('uploadArea').addEventListener('click', function() {
+      document.getElementById('posterFile').click();
+    });
+    
+    // 文件选择变化事件
+    document.getElementById('posterFile').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        // 有文件选择时清空URL输入框
+        document.getElementById('posterUrl').value = '';
+      }
+    });
+    
+    // 生成票根函数
+    function generateTicket() {
+      // 获取表单值
+      const posterUrl = document.getElementById('posterUrl').value;
+      const posterFile = document.getElementById('posterFile').files[0];
+      const movieTitle = document.getElementById('movieTitle').value;
+      const releaseDate = document.getElementById('releaseDate').value;
+      const watchDate = document.getElementById('watchDate').value;
+      const movieGenre = document.getElementById('movieGenre').value;
+      const director = document.getElementById('director').value;
+      const actors = document.getElementById('actors').value;
+      const movieRating = document.getElementById('movieRating').value;
+      const movieSummary = document.getElementById('movieSummary').value;
+      
+      let posterSource = '';
+      
+      // 优先使用上传的文件，否则使用URL
+      if (posterFile) {
+        posterSource = URL.createObjectURL(posterFile);
+      } else if (posterUrl) {
+        posterSource = posterUrl;
+      } else {
+        alert('请提供海报URL或上传海报图片');
+        return;
+      }
+
+      // 处理类型，确保有空格
+      const formattedGenre = movieGenre.replace(/\//g, ' / ');
+
+      // 组装导演和主演信息，只添加有值的字段
+      let directorHtml = '';
+      let actorsHtml = '';
+      
+      if (director) {
+        directorHtml = `
+          <div class="meta-item">
+            <div class="meta-label">导演：</div>
+            <div>${director}</div>
+          </div>
+        `;
+      }
+      
+      if (actors) {
+        // 将逗号分隔的主演列表转换为用顿号分隔
+        const formattedActors = actors.replace(/,/g, '、').replace(/，/g, '、');
+        actorsHtml = `
+          <div class="meta-item">
+            <div class="meta-label">主演：</div>
+            <div>${formattedActors}</div>
+          </div>
+        `;
+      }
+
+      // 组装票根 HTML 结构
+      const ticketHTML = `
+        <div class="ticket-container">
+          <div class="ticket-poster">
+            <img src="${posterSource}" alt="电影海报" id="ticketPoster" />
+          </div>
+          <div class="ticket-info">
+            <div class="ticket-header">
+              <div class="ticket-title-wrapper">
+                <h2 class="ticket-title">${movieTitle}</h2>
+                <div class="ticket-rating">
+                  ${'★'.repeat(movieRating)}${'☆'.repeat(5 - movieRating)}
+                </div>
+              </div>
+              <div class="ticket-title-dash"></div>
+              <div class="ticket-meta">
+                <div class="meta-item">
+                  <div class="meta-label">上映：</div>
+                  <div>${releaseDate}</div>
+                </div>
+                <div class="meta-item">
+                  <div class="meta-label">观影：</div>
+                  <div>${watchDate}</div>
+                </div>
+                <div class="meta-item">
+                  <div class="meta-label">类型：</div>
+                  <div>${formattedGenre}</div>
+                </div>
+                ${directorHtml}
+                ${actorsHtml}
+              </div>
+            </div>
+            <div class="ticket-summary">${movieSummary}</div>
+            <div class="ticket-summary-dash"></div>
+          </div>
+        </div>
+      `;
+
+      // 插入到页面显示
+      document.getElementById('ticketDisplay').innerHTML = ticketHTML;
+      
+      // 启用下载按钮
+      document.getElementById('downloadBtn').disabled = false;
+    }
+    
+    // 下载票根为图片
+    function downloadTicketAsImage() {
+      const ticketContainer = document.querySelector('.ticket-container');
+      if (!ticketContainer) {
+        alert('请先生成票根');
+        return;
+      }
+      
+      // 显示加载状态
+      const downloadBtn = document.getElementById('downloadBtn');
+      const originalText = downloadBtn.innerHTML;
+      downloadBtn.innerHTML = '正在生成图片...';
+      downloadBtn.disabled = true;
+      
+      // 使用html2canvas捕获票根区域
+      html2canvas(ticketContainer, {
+        scale: 2, // 提高分辨率
+        useCORS: true, // 尝试跨域加载图片
+        logging: false,
+        letterRendering: 1,
+        allowTaint: false
+      }).then(canvas => {
+        // 创建下载链接
+        const link = document.createElement('a');
+        const movieTitle = document.getElementById('movieTitle').value || '电影票根';
+        link.download = `${movieTitle}_票根.png`;
+        link.href = canvas.toDataURL('image/png');
+        
+        // 模拟点击下载
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // 恢复按钮状态
+        downloadBtn.innerHTML = originalText;
+        downloadBtn.disabled = false;
+      }).catch(error => {
+        console.error('生成图片失败:', error);
+        alert('生成图片失败，请重试');
+        downloadBtn.innerHTML = originalText;
+        downloadBtn.disabled = false;
+      });
+    }
+  </script>
+</body>
+</html>
