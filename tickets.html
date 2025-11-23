@@ -8,7 +8,7 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
     <style>
-        /* 基础样式 */
+        /* 保持原有样式不变 */
         body {
             background-color: #e0e0e0;
             display: flex;
@@ -20,7 +20,6 @@
             color: #333;
         }
 
-        /* 输入表单样式 */
         .input-form-container {
             width: 900px; 
             padding: 20px;
@@ -76,7 +75,6 @@
             flex: 1;
         }
         
-        /* 新增海报上传/链接容器样式 */
         .poster-input-group {
             border: 1px solid #ccc;
             padding: 10px;
@@ -87,6 +85,8 @@
         .poster-input-group input[type="file"] {
             width: 100%;
             margin-bottom: 10px;
+            padding: 5px 0;
+            border: none;
         }
         .poster-input-group input[type="url"] {
             width: 99%;
@@ -94,7 +94,6 @@
             border: 1px dashed #ddd;
         }
 
-        /* 票根容器及样式保持不变 */
         .ticket-container {
             display: flex;
             width: 900px;
@@ -271,11 +270,19 @@
             <label for="title">片名:</label>
             <input type="text" id="title" value="盗梦空间 (Inception)" required>
 
-            <label>海报图片 (优先使用文件):</label>
+            <label for="posterFile">海报图片 (优先使用本地文件):</label>
             <div class="poster-input-group">
-                <input type="file" id="posterFile" accept="image/*">
+                <input type="file" id="posterFile" accept="image/*"> 
+                
                 <p style="margin: 5px 0; font-size: 0.9em; color: #777; text-align: center;">--- 或粘贴外部链接 (可能受跨域限制) ---</p>
-                <input type="url" id="posterUrl" placeholder="粘贴图片链接 URL" value="https://via.placeholder.com/170x255?text=上传或粘贴海报">
+                
+                <input type="url" id="posterUrl" placeholder="粘贴图片链接 URL" value="">
+                
+                <!-- 新增：图片预览区域 -->
+                <div id="posterPreviewContainer" style="margin-top: 10px; display: none;">
+                    <p style="margin: 5px 0; font-size: 0.9em; color: #777; text-align: center;">预览：</p>
+                    <img id="posterPreview" style="max-width: 100%; max-height: 200px; border-radius: 4px; display: block; margin: 0 auto;" alt="预览图">
+                </div>
             </div>
             
             <label for="director">导演:</label>
@@ -319,7 +326,7 @@
     <div class="ticket-container" id="movieTicket">
         <div class="ticket-section left-section">
             <div class="poster-frame">
-                <img id="ticketPoster" src="" alt="电影海报" class="movie-poster">
+                <img id="ticketPoster" src="https://via.placeholder.com/170x255?text=上传或粘贴海报" alt="电影海报" class="movie-poster">
             </div>
             
             <div class="personal-score" id="ticketScore"></div>
@@ -368,14 +375,12 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- 状态存储 ---
-            // 用于存储 Base64 格式的本地图片数据，优先使用这个作为海报源
             let localPosterData = ''; 
 
             // --- 默认值配置 ---
             const DEFAULT_POSTER_URL = 'https://via.placeholder.com/170x255?text=上传或粘贴海报';
             const DEFAULT_VALUES = {
                 title: '盗梦空间 (Inception)',
-                posterUrl: DEFAULT_POSTER_URL,
                 director: '克里斯托弗·诺兰',
                 myScore: 4.5,
                 type: '科幻 / 悬疑 / 动作',
@@ -438,23 +443,38 @@
              */
             const handlePosterFileChange = (event) => {
                 const file = event.target.files[0];
+                const previewContainer = document.getElementById('posterPreviewContainer');
+                const previewImg = document.getElementById('posterPreview');
+                
                 if (!file) {
-                    localPosterData = ''; // 清除本地数据
+                    localPosterData = '';
+                    previewContainer.style.display = 'none';
                     updateTicket();
+                    return;
+                }
+                
+                // 检查文件大小（限制为5MB）
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('图片文件过大，请选择5MB以下的图片');
+                    event.target.value = ''; // 清空选择
                     return;
                 }
                 
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    localPosterData = e.target.result; // 存储 Base64 数据 URL
-                    updateTicket(); // 更新票根以显示本地图片
+                    localPosterData = e.target.result;
+                    // 显示预览
+                    previewImg.src = localPosterData;
+                    previewContainer.style.display = 'block';
+                    updateTicket();
                 };
                 reader.onerror = () => {
                     localPosterData = '';
+                    previewContainer.style.display = 'none';
                     alert('读取本地图片失败。');
                     updateTicket();
                 };
-                reader.readAsDataURL(file); // 读取文件为 Base64 格式
+                reader.readAsDataURL(file);
             };
 
             /**
@@ -542,12 +562,12 @@
                 const formContainer = document.querySelector('.input-form-container');
                 formContainer.style.display = 'none';
 
-                // 对于本地上传的 Base64 图片，html2canvas 默认可以读取。
-                // 对于外部链接，我们依然需要 useCORS: true 尝试加载。
                 html2canvas(ticketElements.container, {
                     scale: 2, 
-                    useCORS: true, 
-                    backgroundColor: null
+                    useCORS: true,
+                    allowTaint: true, // 允许加载跨域图片
+                    backgroundColor: null,
+                    logging: false // 关闭日志输出
                 }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = `电影票根_${formElements.title.value.substring(0, 10)}.png`;
@@ -561,7 +581,7 @@
                     formContainer.style.display = 'block';
                 }).catch(error => {
                     console.error("导出失败:", error);
-                    alert("图片导出失败。如果使用了外部链接，请尝试上传本地图片或使用支持 CORS 的链接。");
+                    alert("图片导出失败。\n可能原因：\n1. 外部图片存在跨域限制\n2. 图片链接无效\n建议：使用本地上传的图片以确保导出正常。");
                     exportBtn.disabled = false;
                     exportBtn.textContent = '导出为图片 (PNG)';
                     formContainer.style.display = 'block';
@@ -572,6 +592,26 @@
             fileInput.addEventListener('change', handlePosterFileChange);
             generateBtn.addEventListener('click', updateTicket);
             exportBtn.addEventListener('click', exportTicket);
+            
+            // 为海报URL输入框添加预览功能
+            formElements.posterUrl.addEventListener('input', function() {
+                const previewContainer = document.getElementById('posterPreviewContainer');
+                const previewImg = document.getElementById('posterPreview');
+                const url = this.value.trim();
+                
+                if (url) {
+                    previewContainer.style.display = 'block';
+                    previewImg.src = url;
+                    
+                    // 处理外部链接加载失败的情况
+                    previewImg.onerror = function() {
+                        alert('无法加载该图片链接，可能存在跨域限制或链接无效');
+                        previewContainer.style.display = 'none';
+                    };
+                } else {
+                    previewContainer.style.display = 'none';
+                }
+            });
             
             // 页面加载时执行一次初始化
             updateTicket();
