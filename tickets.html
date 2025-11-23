@@ -75,8 +75,6 @@
         .date-range-inputs input {
             flex: 1;
         }
-        
-        /* 海报上传/链接容器样式 */
         .poster-input-group {
             border: 1px solid #ccc;
             padding: 10px;
@@ -87,7 +85,7 @@
         .poster-input-group input[type="file"] {
             width: 100%;
             margin-bottom: 10px;
-            padding: 5px 0;
+            padding: 5px 0; 
             border: none;
         }
         .poster-input-group input[type="url"] {
@@ -96,7 +94,7 @@
             border: 1px dashed #ddd;
         }
 
-        /* 票根容器及样式 */
+        /* 票根容器 */
         .ticket-container {
             display: flex;
             width: 900px;
@@ -109,7 +107,10 @@
             box-sizing: border-box;
             background-clip: padding-box;
         }
-        .ticket-container::before, .ticket-container::after {
+
+        /* 锯齿边缘效果 */
+        .ticket-container::before, 
+        .ticket-container::after {
             content: '';
             position: absolute;
             left: 0;
@@ -128,8 +129,11 @@
             transform: rotate(180deg);
             background-position: 0 0;
         }
+
+        /* 区域布局 */
         .ticket-section {
-            padding: 15px 30px; 
+            /* 减少上下内边距，让内容更紧凑 */
+            padding: 15px 30px;  /* 保持基础内边距 */
             box-sizing: border-box;
         }
         .left-section {
@@ -138,13 +142,18 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* 从顶部开始布局 */
+            justify-content: space-between; 
             text-align: center;
         }
         .right-section {
             width: 65%;
-            padding-top: 15px; /* 与左侧海报顶部间距保持一致 */
+            /* ************ 关键修改：增加右侧上下内边距 ************ */
+            padding-top: 30px; 
+            padding-bottom: 25px;
+            /* ******************************************************* */
         }
+
+        /* 垂直分割线（打孔效果） */
         .separator {
             position: absolute;
             left: 35%;
@@ -154,13 +163,15 @@
             background-size: 100% 10px;
             z-index: 5;
         }
+
+        /* 左侧样式 */
         .poster-frame {
             width: 170px; 
             height: 255px; 
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 15px; /* 海报顶部间距 */
+            margin-top: 15px; 
             margin-bottom: 10px; 
         }
         .movie-poster {
@@ -175,9 +186,8 @@
             letter-spacing: 3px;
             display: flex;
             align-items: center;
-            gap: 3px; 
+            gap: 3px;  
             margin-bottom: 5px; 
-            margin-top: 15px;
         }
         .movie-info-small, .user-id {
             font-size: 0.8em;
@@ -188,6 +198,8 @@
             margin-top: auto; 
             padding-bottom: 5px; 
         }
+
+        /* 星星样式 */
         .star {
             position: relative;
             color: #E50914;
@@ -203,12 +215,16 @@
         .star.empty {
             color: #ccc;
         }
+
+        /* 右侧样式 */
         .movie-title {
             font-family: 'Arial', sans-serif;
             font-size: 1.8em;
             font-weight: 900;
-            margin-top: 0; /* 父容器已设置padding-top，此处无需额外margin */
+            /* ************ 关键修改：增加顶部间距 ************ */
+            margin-top: 0; /* 保持为 0，让 padding 控制顶部留白 */
             margin-bottom: 25px; 
+            /* ******************************************************* */
             line-height: 1.2;
         }
         .divider {
@@ -228,6 +244,7 @@
             color: #555;
             white-space: pre-wrap;
         }
+        /* 台词引号样式 */
         .favorite-quote::before {
             content: "“";
             font-size: 1.8em;
@@ -244,6 +261,8 @@
             color: #333;
             vertical-align: bottom;
         }
+        
+        /* 观影记录列表 */
         .record-item {
             display: flex;
             justify-content: space-between;
@@ -257,6 +276,7 @@
             font-weight: bold;
             padding-left: 10px;
         }
+
         .short-review {
             font-size: 0.8em;
             color: #999;
@@ -282,11 +302,6 @@
                 <p style="margin: 5px 0; font-size: 0.9em; color: #777; text-align: center;">--- 或粘贴外部链接 (可能受跨域限制) ---</p>
                 
                 <input type="url" id="posterUrl" placeholder="粘贴图片链接 URL" value="">
-                
-                <div id="posterPreviewContainer" style="margin-top: 10px; display: none;">
-                    <p style="margin: 5px 0; font-size: 0.9em; color: #777; text-align: center;">预览：</p>
-                    <img id="posterPreview" style="max-width: 100%; max-height: 200px; border-radius: 4px; display: block; margin: 0 auto;" alt="预览图">
-                </div>
             </div>
             
             <label for="director">导演:</label>
@@ -378,7 +393,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- 状态存储 ---
             let localPosterData = ''; 
+
+            // --- 默认值配置 ---
             const DEFAULT_POSTER_URL = 'https://via.placeholder.com/170x255?text=上传或粘贴海报';
             const DEFAULT_VALUES = {
                 title: '盗梦空间 (Inception)',
@@ -395,6 +413,7 @@
                 signature: '@MyBookMovieBlog'
             };
 
+            // --- DOM 元素获取 ---
             const generateBtn = document.getElementById('generateButton');
             const exportBtn = document.getElementById('exportButton');
             const fileInput = document.getElementById('posterFile');
@@ -431,49 +450,46 @@
                 signature: document.getElementById('signature')
             };
 
+            // 初始化表单默认值
             Object.keys(formElements).forEach(key => {
                 if (formElements[key] && formElements[key].value === '' && DEFAULT_VALUES[key] !== undefined) {
                     formElements[key].value = DEFAULT_VALUES[key];
                 }
             });
+            // 确保 posterUrl 初始化时没有默认链接，除非用户输入
+            formElements.posterUrl.value = '';
 
+            /**
+             * 处理文件输入，将本地图片读取为 Base64 格式
+             */
             const handlePosterFileChange = (event) => {
                 const file = event.target.files[0];
-                const previewContainer = document.getElementById('posterPreviewContainer');
-                const previewImg = document.getElementById('posterPreview');
-                
                 if (!file) {
-                    localPosterData = '';
-                    previewContainer.style.display = 'none';
+                    localPosterData = ''; // 清除本地数据
                     updateTicket();
-                    return;
-                }
-                
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('图片文件过大，请选择5MB以下的图片');
-                    event.target.value = '';
                     return;
                 }
                 
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    localPosterData = e.target.result;
-                    previewImg.src = localPosterData;
-                    previewContainer.style.display = 'block';
-                    updateTicket();
+                    localPosterData = e.target.result; // 存储 Base64 数据 URL
+                    updateTicket(); // 更新票根以显示本地图片
                 };
                 reader.onerror = () => {
                     localPosterData = '';
-                    previewContainer.style.display = 'none';
                     alert('读取本地图片失败。');
                     updateTicket();
                 };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(file); // 读取文件为 Base64 格式
             };
 
+            /**
+             * 将数字评分转换为带样式的星星HTML元素
+             */
             const getStarsFromScore = (score) => {
                 const maxStars = 5;
                 const starScore = Math.max(0, Math.min(5, score));
+                
                 let starsHTML = '';
                 for (let i = 0; i < maxStars; i++) {
                     if (starScore >= i + 1) {
@@ -487,6 +503,9 @@
                 return starsHTML;
             };
             
+            /**
+             * 格式化日期为 MM-DD 格式
+             */
             const formatDate = (dateString) => {
                 if (!dateString) return '';
                 const date = new Date(dateString);
@@ -495,6 +514,9 @@
                 return `${month}-${day}`;
             };
 
+            /**
+             * 更新票根内容
+             */
             const updateTicket = () => {
                 ticketElements.title.textContent = formElements.title.value;
                 ticketElements.director.textContent = `导演: ${formElements.director.value}`;
@@ -507,9 +529,11 @@
 
                 const fromDate = formElements.dateFrom.value;
                 const toDate = formElements.dateTo.value;
-                ticketElements.date.textContent = fromDate === toDate 
-                    ? formatDate(fromDate) 
-                    : `${formatDate(fromDate)} - ${formatDate(toDate)}`;
+                if (fromDate === toDate) {
+                    ticketElements.date.textContent = formatDate(fromDate);
+                } else {
+                    ticketElements.date.textContent = `${formatDate(fromDate)} - ${formatDate(toDate)}`;
+                }
 
                 ticketElements.quote.textContent = formElements.quote.value; 
                 
@@ -518,17 +542,23 @@
                 ticketElements.review.textContent = formElements.review.value;
                 ticketElements.signature.textContent = formElements.signature.value;
 
+                // 核心海报处理逻辑：优先使用本地上传的 Base64 数据
                 let posterSrc = localPosterData || formElements.posterUrl.value || DEFAULT_POSTER_URL;
                 ticketElements.poster.src = posterSrc;
                 ticketElements.poster.alt = `${formElements.title.value} 的海报`;
                 
+                // 确保外部链接失败时，至少显示占位图
                 ticketElements.poster.onerror = function() {
+                    // 仅当加载外部 URL 失败时才显示占位符
                     if (this.src.startsWith('http')) {
                         this.src = DEFAULT_POSTER_URL; 
                     }
                 };
             };
 
+            /**
+             * 导出为 PNG 图片
+             */
             const exportTicket = () => {
                 updateTicket(); 
                 
@@ -540,10 +570,8 @@
 
                 html2canvas(ticketElements.container, {
                     scale: 2, 
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: null,
-                    logging: false
+                    useCORS: true, 
+                    backgroundColor: null
                 }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = `电影票根_${formElements.title.value.substring(0, 10)}.png`;
@@ -557,35 +585,19 @@
                     formContainer.style.display = 'block';
                 }).catch(error => {
                     console.error("导出失败:", error);
-                    alert("图片导出失败。\n可能原因：\n1. 外部图片存在跨域限制\n2. 图片链接无效\n建议：使用本地上传的图片以确保导出正常。");
+                    alert("图片导出失败。如果使用了外部链接，请尝试上传本地图片或使用支持 CORS 的链接。");
                     exportBtn.disabled = false;
                     exportBtn.textContent = '导出为图片 (PNG)';
                     formContainer.style.display = 'block';
                 });
             };
 
+            // 绑定事件
             fileInput.addEventListener('change', handlePosterFileChange);
             generateBtn.addEventListener('click', updateTicket);
             exportBtn.addEventListener('click', exportTicket);
             
-            formElements.posterUrl.addEventListener('input', function() {
-                const previewContainer = document.getElementById('posterPreviewContainer');
-                const previewImg = document.getElementById('posterPreview');
-                const url = this.value.trim();
-                
-                if (url) {
-                    previewContainer.style.display = 'block';
-                    previewImg.src = url;
-                    
-                    previewImg.onerror = function() {
-                        alert('无法加载该图片链接，可能存在跨域限制或链接无效');
-                        previewContainer.style.display = 'none';
-                    };
-                } else {
-                    previewContainer.style.display = 'none';
-                }
-            });
-            
+            // 页面加载时执行一次初始化
             updateTicket();
         });
     </script>
