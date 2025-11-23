@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>电影票根生成器 - 横版</title>
+    <title>电影票根生成器 - 横版 (921:438 比例)</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;1,700&family=Merriweather:ital@1&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
@@ -97,8 +97,8 @@
         /* 票根容器 */
         .ticket-container {
             display: flex;
-            width: 900px;
-            height: 383px;
+            width: 900px; /* 宽度不变 */
+            height: 428px; /* *** 调整为新比例 921:438 对应的近似高度 *** */
             background-color: #fff;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -132,25 +132,25 @@
 
         /* 区域布局 */
         .ticket-section {
-            /* 减少上下内边距，让内容更紧凑 */
-            padding: 15px 30px;  /* 保持基础内边距 */
+            padding: 15px 30px; 
             box-sizing: border-box;
         }
         .left-section {
-            width: 35%;
+            width: 35%; /* 保持左侧宽度比例不变 */
             background-color: #f7f7f7;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between; 
             text-align: center;
+            /* 增加左侧上下内边距以适应新高度，保持内容居中 */
+            padding: 25px 30px; 
         }
         .right-section {
             width: 65%;
-            /* ************ 关键修改：增加右侧上下内边距 ************ */
-            padding-top: 30px; 
-            padding-bottom: 25px;
-            /* ******************************************************* */
+            /* *** 调整右侧上下内边距以适应新高度并平衡留白 *** */
+            padding-top: 35px; /* 进一步增加顶部留白 */
+            padding-bottom: 30px; /* 增加底部留白 */
         }
 
         /* 垂直分割线（打孔效果） */
@@ -166,12 +166,12 @@
 
         /* 左侧样式 */
         .poster-frame {
-            width: 170px; 
+            width: 170px; /* 保持海报尺寸，维持布局比例 */
             height: 255px; 
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 15px; 
+            margin-top: 0; /* 适应新的 padding-top */
             margin-bottom: 10px; 
         }
         .movie-poster {
@@ -196,7 +196,7 @@
         }
         .movie-details-bottom {
             margin-top: auto; 
-            padding-bottom: 5px; 
+            padding-bottom: 0; /* 适应新的 padding-bottom */
         }
 
         /* 星星样式 */
@@ -221,10 +221,8 @@
             font-family: 'Arial', sans-serif;
             font-size: 1.8em;
             font-weight: 900;
-            /* ************ 关键修改：增加顶部间距 ************ */
-            margin-top: 0; /* 保持为 0，让 padding 控制顶部留白 */
+            margin-top: 0; 
             margin-bottom: 25px; 
-            /* ******************************************************* */
             line-height: 1.2;
         }
         .divider {
@@ -280,9 +278,9 @@
         .short-review {
             font-size: 0.8em;
             color: #999;
-            margin-top: 15px;
+            margin-top: 20px; /* 增加与上方记录的间距 */
             border-top: 1px dashed #eee;
-            padding-top: 8px;
+            padding-top: 10px; /* 增加内边距 */
             white-space: pre-wrap;
         }
     </style>
@@ -452,12 +450,15 @@
 
             // 初始化表单默认值
             Object.keys(formElements).forEach(key => {
-                if (formElements[key] && formElements[key].value === '' && DEFAULT_VALUES[key] !== undefined) {
-                    formElements[key].value = DEFAULT_VALUES[key];
+                if (formElements[key] && DEFAULT_VALUES[key] !== undefined) {
+                    // 只在输入框为空时设置默认值
+                    if (formElements[key].value === '') {
+                        formElements[key].value = DEFAULT_VALUES[key];
+                    }
                 }
             });
-            // 确保 posterUrl 初始化时没有默认链接，除非用户输入
-            formElements.posterUrl.value = '';
+            // 确保 posterUrl 默认值为空
+            if(formElements.posterUrl) formElements.posterUrl.value = '';
 
             /**
              * 处理文件输入，将本地图片读取为 Base64 格式
@@ -509,6 +510,9 @@
             const formatDate = (dateString) => {
                 if (!dateString) return '';
                 const date = new Date(dateString);
+                // 检查日期是否有效，防止出现 NaN-NaN
+                if (isNaN(date.getTime())) return dateString;
+
                 const month = ('0' + (date.getMonth() + 1)).slice(-2);
                 const day = ('0' + date.getDate()).slice(-2);
                 return `${month}-${day}`;
