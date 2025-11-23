@@ -1,3 +1,18 @@
+好的，我将再次优化引号的显示效果，使其更粗更大，并调整左侧海报的尺寸，使其在现有票根宽度下尽可能放大且协调。
+
+### 主要修改点：
+
+1.  **台词引号样式优化:**
+      * 调整 `.favorite-quote::before` 和 `.favorite-quote::after` 的 `font-size` 和 `font-weight`，使其更显眼。
+      * 略微调整 `margin-right`/`margin-left` 增加引号与文本的间距。
+2.  **左侧海报尺寸优化:**
+      * 增大 `.poster-frame` 的 `width` 和 `height`，并相应调整 `margin-top` 和 `margin-bottom`，以在左侧区域内居中显示。
+
+请将以下所有内容复制并保存为 **`index.html`** 文件。
+
+### 💻 电影票根生成器：进一步优化版本
+
+```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -22,7 +37,6 @@
 
         /* 输入表单样式 */
         .input-form-container {
-            /* 调整表单宽度以匹配新票根宽度 */
             width: 900px; 
             padding: 20px;
             margin-bottom: 20px;
@@ -80,7 +94,6 @@
         /* 票根容器 */
         .ticket-container {
             display: flex;
-            /* **修改宽度和高度以符合 900x383** */
             width: 900px;
             height: 383px;
             background-color: #fff;
@@ -115,7 +128,6 @@
         }
 
         /* 区域布局 */
-        /* 调整 padding 以适应更薄的票根，减少上下空间占用 */
         .ticket-section {
             padding: 25px 30px; 
             box-sizing: border-box;
@@ -146,14 +158,14 @@
 
         /* 左侧样式 */
         .poster-frame {
-            /* 调整海报尺寸以适应更低的票根高度 */
-            width: 120px; 
-            height: 180px; 
+            /* **优化海报尺寸** */
+            width: 150px; /* 增加宽度 */
+            height: 225px; /* 增加高度 (保持 2:3 比例) */
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 5px; 
-            margin-bottom: 10px;
+            margin-top: 20px; /* 调整顶部间距 */
+            margin-bottom: 25px; /* 调整底部间距 */
         }
         .movie-poster {
             width: 100%;
@@ -161,7 +173,7 @@
             object-fit: cover;
         }
         .personal-score {
-            font-size: 1.6em; /* 略微缩小字体 */
+            font-size: 1.6em;
             font-weight: bold;
             color: #E50914;
             letter-spacing: 3px;
@@ -177,7 +189,7 @@
         }
         .movie-details-bottom {
             margin-top: auto; 
-            padding-bottom: 10px; /* 减少底部留白 */
+            padding-bottom: 10px;
         }
 
         /* 星星样式 */
@@ -200,35 +212,52 @@
         /* 右侧样式 */
         .movie-title {
             font-family: 'Arial', sans-serif;
-            font-size: 1.8em; /* 缩小标题字体 */
+            font-size: 1.8em;
             font-weight: 900;
             margin-top: 0;
-            margin-bottom: 8px;
+            margin-bottom: 15px; /* 增加与台词的间距 */
             line-height: 1.2;
         }
         .divider {
             border: none;
             border-top: 1px solid #eee;
-            margin: 12px 0; /* 缩小分隔线间距 */
+            margin: 12px 0;
         }
         .quote-box {
-            margin-bottom: 15px; /* 缩小台词下方间距 */
+            margin-bottom: 15px;
         }
         .favorite-quote {
             font-family: 'Merriweather', serif;
             font-style: italic;
-            font-size: 1.0em; /* 略微缩小台词字体 */
+            font-size: 1.0em;
             margin: 5px 0 0 0;
             line-height: 1.4;
             color: #555;
             white-space: pre-wrap;
+        }
+        /* **台词引号优化：加粗放大** */
+        .favorite-quote::before {
+            content: "“";
+            font-size: 1.8em; /* 进一步放大 */
+            font-weight: 900; /* 加粗 */
+            margin-right: 4px; /* 增加间距 */
+            color: #333;
+            vertical-align: top; /* 调整对齐 */
+        }
+        .favorite-quote::after {
+            content: "”";
+            font-size: 1.8em; /* 进一步放大 */
+            font-weight: 900; /* 加粗 */
+            margin-left: 4px; /* 增加间距 */
+            color: #333;
+            vertical-align: bottom; /* 调整对齐 */
         }
         
         /* 观影记录列表 */
         .record-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px; /* 缩小行间距 */
+            margin-bottom: 6px;
             font-size: 0.9em;
         }
         .record-label {
@@ -242,9 +271,9 @@
         .short-review {
             font-size: 0.8em;
             color: #999;
-            margin-top: 15px; /* 缩小上边距 */
+            margin-top: 15px;
             border-top: 1px dashed #eee;
-            padding-top: 8px; /* 缩小内边距 */
+            padding-top: 8px;
             white-space: pre-wrap;
         }
     </style>
@@ -268,6 +297,9 @@
             
             <label for="type">类型:</label>
             <input type="text" id="type" value="科幻 / 悬疑 / 动作">
+            
+            <label for="duration">集数/时长:</label>
+            <input type="text" id="duration" value="148 分钟 / 1 季 10 集">
 
             <label for="quote">喜欢的台词:</label>
             <textarea id="quote">你的思想，是你的财富。保护好它。</textarea>
@@ -324,6 +356,11 @@
             </div>
             
             <div class="record-item">
+                <span class="record-label">⏱️ 集数/时长</span>
+                <span class="record-value" id="ticketDuration"></span>
+            </div>
+            
+            <div class="record-item">
                 <span class="record-label">📅 观看日期</span>
                 <span class="record-value" id="ticketDate"></span>
             </div>
@@ -348,6 +385,7 @@
                 director: '克里斯托弗·诺兰',
                 myScore: 4.5,
                 type: '科幻 / 悬疑 / 动作',
+                duration: '148 分钟', // 新增默认值
                 quote: '你的思想，是你的财富。保护好它。',
                 dateFrom: '2025-11-23',
                 dateTo: '2025-11-23',
@@ -366,6 +404,7 @@
                 director: document.getElementById('ticketDirector'),
                 score: document.getElementById('ticketScore'),
                 type: document.getElementById('ticketType'),
+                duration: document.getElementById('ticketDuration'), 
                 quote: document.getElementById('ticketQuote'),
                 date: document.getElementById('ticketDate'),
                 location: document.getElementById('ticketLocation'),
@@ -380,6 +419,7 @@
                 director: document.getElementById('director'),
                 myScore: document.getElementById('myScore'),
                 type: document.getElementById('type'),
+                duration: document.getElementById('duration'), 
                 quote: document.getElementById('quote'),
                 dateFrom: document.getElementById('dateFrom'),
                 dateTo: document.getElementById('dateTo'),
@@ -391,7 +431,7 @@
 
             // 初始化表单默认值
             Object.keys(formElements).forEach(key => {
-                if (formElements[key].value === '' && DEFAULT_VALUES[key] !== undefined) {
+                if (formElements[key] && formElements[key].value === '' && DEFAULT_VALUES[key] !== undefined) {
                     formElements[key].value = DEFAULT_VALUES[key];
                 }
             });
@@ -403,17 +443,16 @@
              */
             const getStarsFromScore = (score) => {
                 const maxStars = 5;
-                // score 已经是 1-5 分制
                 const starScore = Math.max(0, Math.min(5, score));
                 
                 let starsHTML = '';
                 for (let i = 0; i < maxStars; i++) {
                     if (starScore >= i + 1) {
-                        starsHTML += '<span class="star">★</span>'; // 满星
+                        starsHTML += '<span class="star">★</span>'; 
                     } else if (starScore >= i + 0.5) {
-                        starsHTML += '<span class="star half">★</span>'; // 半星
+                        starsHTML += '<span class="star half">★</span>'; 
                     } else {
-                        starsHTML += '<span class="star empty">☆</span>'; // 空星
+                        starsHTML += '<span class="star empty">☆</span>';
                     }
                 }
                 return starsHTML;
@@ -421,8 +460,6 @@
             
             /**
              * 格式化日期为 MM-DD 格式
-             * @param {string} dateString - 日期字符串 (YYYY-MM-DD)
-             * @returns {string} 格式化后的日期 (MM-DD)
              */
             const formatDate = (dateString) => {
                 if (!dateString) return '';
@@ -443,6 +480,7 @@
                 ticketElements.score.innerHTML = getStarsFromScore(score);
 
                 ticketElements.type.textContent = formElements.type.value;
+                ticketElements.duration.textContent = formElements.duration.value;
 
                 const fromDate = formElements.dateFrom.value;
                 const toDate = formElements.dateTo.value;
@@ -452,17 +490,20 @@
                     ticketElements.date.textContent = `${formatDate(fromDate)} - ${formatDate(toDate)}`;
                 }
 
-                ticketElements.quote.textContent = `“${formElements.quote.value}”`;
+                ticketElements.quote.textContent = formElements.quote.value; 
+                
                 ticketElements.location.textContent = formElements.location.value;
                 ticketElements.stubId.textContent = formElements.stubId.value;
                 ticketElements.review.textContent = formElements.review.value;
                 ticketElements.signature.textContent = formElements.signature.value;
 
-                // 图片处理
-                ticketElements.poster.src = formElements.poster.value;
+                // 修复海报显示问题
+                const newPosterUrl = formElements.poster.value;
+                ticketElements.poster.src = newPosterUrl;
                 ticketElements.poster.alt = `${formElements.title.value} 的海报`;
+                
                 ticketElements.poster.onerror = function() {
-                    this.src = 'https://via.placeholder.com/120x180?text=海报加载失败'; // 更改占位图尺寸
+                    this.src = 'https://via.placeholder.com/150x225?text=海报加载失败'; // 更改占位图尺寸以匹配新海报大小
                 };
             };
 
@@ -512,3 +553,4 @@
     </script>
 </body>
 </html>
+```
