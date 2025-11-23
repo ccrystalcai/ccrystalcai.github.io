@@ -22,7 +22,8 @@
 
         /* 输入表单样式 */
         .input-form-container {
-            width: 800px;
+            /* 调整表单宽度以匹配新票根宽度 */
+            width: 900px; 
             padding: 20px;
             margin-bottom: 20px;
             background-color: #f8f8f8;
@@ -79,8 +80,9 @@
         /* 票根容器 */
         .ticket-container {
             display: flex;
-            width: 800px;
-            height: 400px;
+            /* **修改宽度和高度以符合 900x383** */
+            width: 900px;
+            height: 383px;
             background-color: #fff;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -113,8 +115,9 @@
         }
 
         /* 区域布局 */
+        /* 调整 padding 以适应更薄的票根，减少上下空间占用 */
         .ticket-section {
-            padding: 30px;
+            padding: 25px 30px; 
             box-sizing: border-box;
         }
         .left-section {
@@ -143,13 +146,14 @@
 
         /* 左侧样式 */
         .poster-frame {
-            width: 150px;
-            height: 225px;
+            /* 调整海报尺寸以适应更低的票根高度 */
+            width: 120px; 
+            height: 180px; 
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 15px;
-            margin-bottom: 20px;
+            margin-top: 5px; 
+            margin-bottom: 10px;
         }
         .movie-poster {
             width: 100%;
@@ -157,14 +161,14 @@
             object-fit: cover;
         }
         .personal-score {
-            font-size: 1.8em;
+            font-size: 1.6em; /* 略微缩小字体 */
             font-weight: bold;
             color: #E50914;
-            letter-spacing: 3px; /* 增加星星间距 */
+            letter-spacing: 3px;
             display: flex;
             align-items: center;
             gap: 3px; 
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .movie-info-small, .user-id {
             font-size: 0.8em;
@@ -173,7 +177,7 @@
         }
         .movie-details-bottom {
             margin-top: auto; 
-            padding-bottom: 15px; 
+            padding-bottom: 10px; /* 减少底部留白 */
         }
 
         /* 星星样式 */
@@ -196,54 +200,51 @@
         /* 右侧样式 */
         .movie-title {
             font-family: 'Arial', sans-serif;
-            font-size: 2em;
+            font-size: 1.8em; /* 缩小标题字体 */
             font-weight: 900;
             margin-top: 0;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             line-height: 1.2;
         }
         .divider {
             border: none;
             border-top: 1px solid #eee;
-            margin: 15px 0;
+            margin: 12px 0; /* 缩小分隔线间距 */
         }
         .quote-box {
-            margin-bottom: 20px;
+            margin-bottom: 15px; /* 缩小台词下方间距 */
         }
         .favorite-quote {
             font-family: 'Merriweather', serif;
             font-style: italic;
-            font-size: 1.1em;
+            font-size: 1.0em; /* 略微缩小台词字体 */
             margin: 5px 0 0 0;
-            line-height: 1.5;
+            line-height: 1.4;
             color: #555;
             white-space: pre-wrap;
         }
         
-        /* 观影记录列表 - 移除虚线后的简洁布局 */
+        /* 观影记录列表 */
         .record-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 6px; /* 缩小行间距 */
             font-size: 0.9em;
-            /* 移除 position: relative 和 z-index */
         }
         .record-label {
             color: #666;
-            /* 标签后的点引导线已被移除 */
         }
         .record-value {
             font-weight: bold;
             padding-left: 10px;
-            /* 移除 background-color: #fff; 和 z-index */
         }
 
         .short-review {
             font-size: 0.8em;
             color: #999;
-            margin-top: 20px;
+            margin-top: 15px; /* 缩小上边距 */
             border-top: 1px dashed #eee;
-            padding-top: 10px;
+            padding-top: 8px; /* 缩小内边距 */
             white-space: pre-wrap;
         }
     </style>
@@ -345,7 +346,7 @@
                 title: '盗梦空间 (Inception)',
                 poster: 'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg',
                 director: '克里斯托弗·诺兰',
-                myScore: 4.5, // 修改默认评分
+                myScore: 4.5,
                 type: '科幻 / 悬疑 / 动作',
                 quote: '你的思想，是你的财富。保护好它。',
                 dateFrom: '2025-11-23',
@@ -461,7 +462,7 @@
                 ticketElements.poster.src = formElements.poster.value;
                 ticketElements.poster.alt = `${formElements.title.value} 的海报`;
                 ticketElements.poster.onerror = function() {
-                    this.src = 'https://via.placeholder.com/150x225?text=海报加载失败';
+                    this.src = 'https://via.placeholder.com/120x180?text=海报加载失败'; // 更改占位图尺寸
                 };
             };
 
@@ -475,7 +476,7 @@
                 exportBtn.textContent = '生成中...';
 
                 const formContainer = document.querySelector('.input-form-container');
-                formContainer.style.display = 'none'; // 暂时隐藏表单
+                formContainer.style.display = 'none';
 
                 html2canvas(ticketElements.container, {
                     scale: 2, 
@@ -491,13 +492,13 @@
                     
                     exportBtn.disabled = false;
                     exportBtn.textContent = '导出为图片 (PNG)';
-                    formContainer.style.display = 'block'; // 恢复表单
+                    formContainer.style.display = 'block';
                 }).catch(error => {
                     console.error("导出失败:", error);
                     alert("图片导出失败，请检查浏览器权限或图片链接是否可访问。");
                     exportBtn.disabled = false;
                     exportBtn.textContent = '导出为图片 (PNG)';
-                    formContainer.style.display = 'block'; // 恢复表单
+                    formContainer.style.display = 'block';
                 });
             };
 
