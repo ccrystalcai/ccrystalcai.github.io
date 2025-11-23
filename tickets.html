@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>电影票根生成器 - 横版 (921:438 比例)</title>
+    <title>电影票根生成器 - 横版 (706x294 比例)</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;1,700&family=Merriweather:ital@1&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
@@ -14,25 +14,26 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px;
+            padding: 20px;
             margin: 0;
             font-family: 'Roboto Mono', monospace;
             color: #333;
         }
 
-        /* 输入表单样式 */
+        /* 输入表单样式 (宽度适应票根，但内容不变) */
         .input-form-container {
-            width: 900px; 
-            padding: 20px;
-            margin-bottom: 20px;
+            width: 706px; /* 调整宽度以适应新票根 */
+            padding: 15px;
+            margin-bottom: 15px;
             background-color: #f8f8f8;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
         }
         .input-form-container label {
             display: block;
-            margin-top: 15px;
+            margin-top: 12px;
             font-weight: bold;
+            font-size: 0.9em;
         }
         .input-form-container input[type="text"], 
         .input-form-container input[type="url"],
@@ -40,25 +41,27 @@
         .input-form-container input[type="date"],
         .input-form-container textarea {
             width: 98%;
-            padding: 8px;
-            margin-top: 5px;
+            padding: 6px;
+            margin-top: 4px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 3px;
             box-sizing: border-box;
             font-family: inherit;
+            font-size: 0.9em;
         }
         .input-form-container textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 60px;
         }
         .input-form-container button {
-            padding: 10px 15px;
-            margin-top: 20px;
-            margin-right: 10px;
+            padding: 8px 12px;
+            margin-top: 15px;
+            margin-right: 8px;
             border: none;
-            border-radius: 4px;
+            border-radius: 3px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 0.9em;
         }
         #generateButton {
             background-color: #007bff;
@@ -70,38 +73,38 @@
         }
         .date-range-inputs {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
         .date-range-inputs input {
             flex: 1;
         }
         .poster-input-group {
             border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 5px;
+            padding: 8px;
+            border-radius: 3px;
+            margin-top: 4px;
             background-color: #fff;
         }
         .poster-input-group input[type="file"] {
             width: 100%;
-            margin-bottom: 10px;
-            padding: 5px 0; 
+            margin-bottom: 8px;
+            padding: 4px 0; 
             border: none;
         }
         .poster-input-group input[type="url"] {
             width: 99%;
-            margin-top: 5px;
+            margin-top: 4px;
             border: 1px dashed #ddd;
         }
 
         /* 票根容器 */
         .ticket-container {
             display: flex;
-            width: 900px; 
-            height: 428px; 
+            width: 706px; /* *** 尺寸调整：706px *** */
+            height: 294px; /* *** 尺寸调整：294px *** */
             background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 9px; /* 相应缩小 */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
             box-sizing: border-box;
@@ -115,17 +118,17 @@
             position: absolute;
             left: 0;
             right: 0;
-            height: 10px;
-            background: radial-gradient(circle at 5px 5px, transparent 5px, #fff 5px);
-            background-size: 10px 10px;
+            height: 8px; /* 相应缩小 */
+            background: radial-gradient(circle at 4px 4px, transparent 4px, #fff 4px); /* 相应缩小 */
+            background-size: 8px 8px;
             z-index: 10;
         }
         .ticket-container::before {
-            top: -5px;
+            top: -4px; /* 相应缩小 */
             background-position: 0 0;
         }
         .ticket-container::after {
-            bottom: -5px;
+            bottom: -4px; /* 相应缩小 */
             transform: rotate(180deg);
             background-position: 0 0;
         }
@@ -135,22 +138,23 @@
             box-sizing: border-box;
         }
         .left-section {
-            width: 35%; 
+            width: 35%; /* 比例维持不变 */
             background-color: #f7f7f7;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between; 
             text-align: center;
-            /* *** 关键修改：左侧上下内边距与右侧保持一致 *** */
-            padding: 35px 30px 30px; /* 顶部35px, 左右30px, 底部30px */
+            /* *** 左侧留白优化：适应新高度294px *** */
+            padding: 22px 20px 20px; 
         }
         .right-section {
-            width: 65%;
-            padding-top: 35px; /* 保持与左侧顶部一致 */
-            padding-bottom: 30px; /* 保持与左侧底部一致 */
-            padding-left: 30px; /* 确保右侧有左内边距 */
-            padding-right: 30px; /* 确保右侧有右内边距 */
+            width: 65%; /* 比例维持不变 */
+            /* *** 右侧留白优化：与左侧顶部对齐，并保持底部平衡 *** */
+            padding-top: 22px; 
+            padding-bottom: 20px; 
+            padding-left: 25px; 
+            padding-right: 25px; 
         }
 
         /* 垂直分割线（打孔效果） */
@@ -159,20 +163,20 @@
             left: 35%;
             height: 100%;
             width: 1px;
-            background: linear-gradient(to bottom, #ccc 0%, #ccc 5px, transparent 5px, transparent 10px);
-            background-size: 100% 10px;
+            background: linear-gradient(to bottom, #ccc 0%, #ccc 4px, transparent 4px, transparent 8px); /* 相应缩小 */
+            background-size: 100% 8px;
             z-index: 5;
         }
 
         /* 左侧样式 */
         .poster-frame {
-            width: 170px; 
-            height: 255px; 
-            border-radius: 8px;
+            width: 135px; /* *** 缩放后的海报宽度 *** */
+            height: 203px; /* *** 缩放后的海报高度 (比例 1.5:1) *** */
+            border-radius: 6px; /* 相应缩小 */
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 0; /* 这里的 margin-top 设为0，由 .left-section 的 padding-top 控制 */
-            margin-bottom: 10px; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 0; 
+            margin-bottom: 8px; /* 相应缩小 */
         }
         .movie-poster {
             width: 100%;
@@ -180,19 +184,19 @@
             object-fit: cover;
         }
         .personal-score {
-            font-size: 1.6em;
+            font-size: 1.3em; /* 相应缩小 */
             font-weight: bold;
             color: #E50914;
-            letter-spacing: 3px;
+            letter-spacing: 2px; /* 相应缩小 */
             display: flex;
             align-items: center;
-            gap: 3px;  
-            margin-bottom: 5px; 
+            gap: 2px; /* 相应缩小 */
+            margin-bottom: 4px; /* 相应缩小 */
         }
         .movie-info-small, .user-id {
-            font-size: 0.8em;
+            font-size: 0.75em; /* 相应缩小 */
             color: #999;
-            margin: 3px 0;
+            margin: 2px 0; /* 相应缩小 */
         }
         .movie-details-bottom {
             margin-top: auto; 
@@ -201,6 +205,7 @@
 
         /* 星星样式 */
         .star {
+            font-size: 1em; /* 维持相对大小 */
             position: relative;
             color: #E50914;
             display: inline-block; 
@@ -219,25 +224,25 @@
         /* 右侧样式 */
         .movie-title {
             font-family: 'Arial', sans-serif;
-            font-size: 1.8em;
+            font-size: 1.5em; /* 相应缩小 */
             font-weight: 900;
             margin-top: 0; 
-            margin-bottom: 25px; 
+            margin-bottom: 20px; /* 相应缩小 */
             line-height: 1.2;
         }
         .divider {
             border: none;
             border-top: 1px solid #eee;
-            margin: 12px 0;
+            margin: 10px 0; /* 相应缩小 */
         }
         .quote-box {
-            margin-bottom: 15px;
+            margin-bottom: 12px; /* 相应缩小 */
         }
         .favorite-quote {
             font-family: 'Merriweather', serif;
             font-style: italic;
-            font-size: 1.0em;
-            margin: 5px 0 0 0;
+            font-size: 0.85em; /* 相应缩小 */
+            margin: 4px 0 0 0; /* 相应缩小 */
             line-height: 1.4;
             color: #555;
             white-space: pre-wrap;
@@ -245,17 +250,17 @@
         /* 台词引号样式 */
         .favorite-quote::before {
             content: "“";
-            font-size: 1.8em;
+            font-size: 1.5em; /* 相应缩小 */
             font-weight: 900;
-            margin-right: 4px;
+            margin-right: 3px; /* 相应缩小 */
             color: #333;
             vertical-align: top;
         }
         .favorite-quote::after {
             content: "”";
-            font-size: 1.8em;
+            font-size: 1.5em; /* 相应缩小 */
             font-weight: 900;
-            margin-left: 4px;
+            margin-left: 3px; /* 相应缩小 */
             color: #333;
             vertical-align: bottom;
         }
@@ -264,23 +269,23 @@
         .record-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
-            font-size: 0.9em;
+            margin-bottom: 5px; /* 相应缩小 */
+            font-size: 0.8em; /* 相应缩小 */
         }
         .record-label {
             color: #666;
         }
         .record-value {
             font-weight: bold;
-            padding-left: 10px;
+            padding-left: 8px; /* 相应缩小 */
         }
 
         .short-review {
-            font-size: 0.8em;
+            font-size: 0.75em; /* 相应缩小 */
             color: #999;
-            margin-top: 20px; 
+            margin-top: 15px; /* 相应缩小 */
             border-top: 1px dashed #eee;
-            padding-top: 10px; 
+            padding-top: 8px; /* 相应缩小 */
             white-space: pre-wrap;
         }
     </style>
@@ -343,7 +348,7 @@
     <div class="ticket-container" id="movieTicket">
         <div class="ticket-section left-section">
             <div class="poster-frame">
-                <img id="ticketPoster" src="https://via.placeholder.com/170x255?text=上传或粘贴海报" alt="电影海报" class="movie-poster">
+                <img id="ticketPoster" src="https://via.placeholder.com/135x203?text=上传或粘贴海报" alt="电影海报" class="movie-poster">
             </div>
             
             <div class="personal-score" id="ticketScore"></div>
@@ -395,7 +400,7 @@
             let localPosterData = ''; 
 
             // --- 默认值配置 ---
-            const DEFAULT_POSTER_URL = 'https://via.placeholder.com/170x255?text=上传或粘贴海报';
+            const DEFAULT_POSTER_URL = 'https://via.placeholder.com/135x203?text=上传或粘贴海报';
             const DEFAULT_VALUES = {
                 title: '盗梦空间 (Inception)',
                 director: '克里斯托弗·诺兰',
@@ -566,8 +571,9 @@
                 const formContainer = document.querySelector('.input-form-container');
                 formContainer.style.display = 'none';
 
+                // 使用较高的 scale 确保导出清晰
                 html2canvas(ticketElements.container, {
-                    scale: 2, 
+                    scale: 3, 
                     useCORS: true, 
                     backgroundColor: null
                 }).then(canvas => {
