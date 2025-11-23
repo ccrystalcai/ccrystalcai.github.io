@@ -97,8 +97,8 @@
         /* 票根容器 */
         .ticket-container {
             display: flex;
-            width: 900px; /* 宽度不变 */
-            height: 428px; /* *** 调整为新比例 921:438 对应的近似高度 *** */
+            width: 900px; 
+            height: 428px; 
             background-color: #fff;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -132,25 +132,25 @@
 
         /* 区域布局 */
         .ticket-section {
-            padding: 15px 30px; 
             box-sizing: border-box;
         }
         .left-section {
-            width: 35%; /* 保持左侧宽度比例不变 */
+            width: 35%; 
             background-color: #f7f7f7;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between; 
             text-align: center;
-            /* 增加左侧上下内边距以适应新高度，保持内容居中 */
-            padding: 25px 30px; 
+            /* *** 关键修改：左侧上下内边距与右侧保持一致 *** */
+            padding: 35px 30px 30px; /* 顶部35px, 左右30px, 底部30px */
         }
         .right-section {
             width: 65%;
-            /* *** 调整右侧上下内边距以适应新高度并平衡留白 *** */
-            padding-top: 35px; /* 进一步增加顶部留白 */
-            padding-bottom: 30px; /* 增加底部留白 */
+            padding-top: 35px; /* 保持与左侧顶部一致 */
+            padding-bottom: 30px; /* 保持与左侧底部一致 */
+            padding-left: 30px; /* 确保右侧有左内边距 */
+            padding-right: 30px; /* 确保右侧有右内边距 */
         }
 
         /* 垂直分割线（打孔效果） */
@@ -166,12 +166,12 @@
 
         /* 左侧样式 */
         .poster-frame {
-            width: 170px; /* 保持海报尺寸，维持布局比例 */
+            width: 170px; 
             height: 255px; 
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 0; /* 适应新的 padding-top */
+            margin-top: 0; /* 这里的 margin-top 设为0，由 .left-section 的 padding-top 控制 */
             margin-bottom: 10px; 
         }
         .movie-poster {
@@ -196,7 +196,7 @@
         }
         .movie-details-bottom {
             margin-top: auto; 
-            padding-bottom: 0; /* 适应新的 padding-bottom */
+            padding-bottom: 0; 
         }
 
         /* 星星样式 */
@@ -278,9 +278,9 @@
         .short-review {
             font-size: 0.8em;
             color: #999;
-            margin-top: 20px; /* 增加与上方记录的间距 */
+            margin-top: 20px; 
             border-top: 1px dashed #eee;
-            padding-top: 10px; /* 增加内边距 */
+            padding-top: 10px; 
             white-space: pre-wrap;
         }
     </style>
@@ -451,13 +451,11 @@
             // 初始化表单默认值
             Object.keys(formElements).forEach(key => {
                 if (formElements[key] && DEFAULT_VALUES[key] !== undefined) {
-                    // 只在输入框为空时设置默认值
                     if (formElements[key].value === '') {
                         formElements[key].value = DEFAULT_VALUES[key];
                     }
                 }
             });
-            // 确保 posterUrl 默认值为空
             if(formElements.posterUrl) formElements.posterUrl.value = '';
 
             /**
@@ -510,7 +508,6 @@
             const formatDate = (dateString) => {
                 if (!dateString) return '';
                 const date = new Date(dateString);
-                // 检查日期是否有效，防止出现 NaN-NaN
                 if (isNaN(date.getTime())) return dateString;
 
                 const month = ('0' + (date.getMonth() + 1)).slice(-2);
@@ -546,14 +543,11 @@
                 ticketElements.review.textContent = formElements.review.value;
                 ticketElements.signature.textContent = formElements.signature.value;
 
-                // 核心海报处理逻辑：优先使用本地上传的 Base64 数据
                 let posterSrc = localPosterData || formElements.posterUrl.value || DEFAULT_POSTER_URL;
                 ticketElements.poster.src = posterSrc;
                 ticketElements.poster.alt = `${formElements.title.value} 的海报`;
                 
-                // 确保外部链接失败时，至少显示占位图
                 ticketElements.poster.onerror = function() {
-                    // 仅当加载外部 URL 失败时才显示占位符
                     if (this.src.startsWith('http')) {
                         this.src = DEFAULT_POSTER_URL; 
                     }
