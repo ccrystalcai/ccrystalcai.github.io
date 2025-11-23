@@ -31,7 +31,7 @@
         }
         .input-form-container label {
             display: block;
-            margin-top: 10px;
+            margin-top: 15px;
             font-weight: bold;
         }
         .input-form-container input[type="text"], 
@@ -67,6 +67,13 @@
         #exportButton {
             background-color: #28a745;
             color: white;
+        }
+        .date-range-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        .date-range-inputs input {
+            flex: 1;
         }
 
         /* 票根容器 */
@@ -117,6 +124,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
+            text-align: center;
         }
         .right-section {
             width: 65%;
@@ -148,20 +156,41 @@
             object-fit: cover;
         }
         .personal-score {
-            font-size: 1.5em;
+            font-size: 1.8em;
             font-weight: bold;
             color: #E50914;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
         }
         .movie-info-small, .user-id {
             font-size: 0.8em;
             color: #999;
-            text-align: center;
-            margin: 5px 0;
+            margin: 3px 0;
+        }
+
+        /* 星星样式 */
+        .star {
+            position: relative;
+            color: #E50914;
+        }
+        .star.half::after {
+            content: '☆';
+            position: absolute;
+            top: 0;
+            left: 0;
+            color: transparent;
+            background: linear-gradient(to right, #E50914 50%, transparent 50%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        .star.empty {
+            color: #ccc;
         }
 
         /* 右侧样式 */
         .movie-title {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             font-size: 2em;
             font-weight: 900;
             margin-top: 0;
@@ -185,7 +214,6 @@
             color: #555;
             white-space: pre-wrap;
         }
-        /* 移除了 .quote-icon 的样式，因为它已被删除 */
         .record-item {
             display: flex;
             justify-content: space-between;
@@ -195,26 +223,10 @@
         }
         .record-label {
             color: #666;
-            position: relative;
-            flex-grow: 1;
-        }
-        .record-label::after {
-            content: "....................................................................................................";
-            display: block;
-            white-space: nowrap;
-            overflow: hidden;
-            position: absolute;
-            bottom: 0;
-            left: 100%;
-            color: #ccc;
-            letter-spacing: 2px;
-            width: 100%;
         }
         .record-value {
             font-weight: bold;
-            z-index: 2;
-            background-color: #fff;
-            padding-left: 5px;
+            padding-left: 10px;
         }
         .short-review {
             font-size: 0.8em;
@@ -235,16 +247,25 @@
             <input type="text" id="title" value="盗梦空间 (Inception)" required>
 
             <label for="poster">海报链接 (URL):</label>
-            <input type="url" id="poster" value="https://via.placeholder.com/150x225?text=Movie+Poster" required>
+            <input type="url" id="poster" value="https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg" required>
             
+            <label for="director">导演:</label>
+            <input type="text" id="director" value="克里斯托弗·诺兰" required>
+
             <label for="myScore">我的评分 (1-10):</label>
             <input type="number" id="myScore" min="1" max="10" step="0.1" value="9.5" required>
             
+            <label for="type">类型:</label>
+            <input type="text" id="type" value="科幻 / 悬疑 / 动作" required>
+
             <label for="quote">喜欢的台词:</label>
             <textarea id="quote">你的思想，是你的财富。保护好它。</textarea>
 
-            <label for="date">观看日期:</label>
-            <input type="date" id="date" value="2025-11-23" required>
+            <label>观看日期:</label>
+            <div class="date-range-inputs">
+                <input type="date" id="dateFrom" value="2025-11-23" required>
+                <input type="date" id="dateTo" value="2025-11-25" required>
+            </div>
 
             <label for="location">电影院 / 地点:</label>
             <input type="text" id="location" value="XXX 城市影城">
@@ -254,6 +275,9 @@
 
             <label for="review">个人短评:</label>
             <input type="text" id="review" value="一部值得二刷三刷的电影，细节和配乐都非常震撼人心。">
+            
+            <label for="signature">个人签名/ID:</label>
+            <input type="text" id="signature" value="@MyBookMovieBlog">
 
             <button type="button" id="generateButton">更新票根</button>
             <button type="button" id="exportButton">导出为图片 (PNG)</button>
@@ -266,20 +290,30 @@
             <div class="poster-frame">
                 <img id="ticketPoster" src="" alt="电影海报" class="movie-poster">
             </div>
-            <div class="personal-score" id="ticketScore"></div>
-            <div class="movie-info-small">导演: 诺兰 (2010)</div>
-            <div class="user-id">@MyBookMovieBlog</div>
+            <div>
+                <!-- 只显示星星评分 -->
+                <div class="personal-score" id="ticketScore"></div>
+            </div>
+            <div>
+                <div class="movie-info-small" id="ticketDirector"></div>
+                <div class="user-id" id="ticketSignature"></div>
+            </div>
         </div>
 
         <div class="separator"></div>
 
         <div class="ticket-section right-section">
             <h1 class="movie-title" id="ticketTitle"></h1>
-            <!-- 修改点 1: 移除了 <span class="quote-icon">💬</span> -->
             <div class="quote-box">
                 <p class="favorite-quote" id="ticketQuote"></p>
             </div>
             <hr class="divider">
+            <!-- 新增的“类型”显示区域 -->
+            <div class="record-item">
+                <span class="record-label">🎬 类型</span>
+                <span class="record-value" id="ticketType"></span>
+            </div>
+            <!-- 更新后的“观看日期”显示区域 -->
             <div class="record-item">
                 <span class="record-label">📅 观看日期</span>
                 <span class="record-value" id="ticketDate"></span>
@@ -298,48 +332,126 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- 默认值配置 ---
+            const DEFAULT_VALUES = {
+                title: '盗梦空间 (Inception)',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg',
+                director: '克里斯托弗·诺兰',
+                myScore: 9.5,
+                type: '科幻 / 悬疑 / 动作',
+                quote: '你的思想，是你的财富。保护好它。',
+                dateFrom: '2025-11-23',
+                dateTo: '2025-11-25',
+                location: 'XXX 城市影城',
+                stubId: 'ID-MS8021',
+                review: '一部值得二刷三刷的电影，细节和配乐都非常震撼人心。',
+                signature: '@MyBookMovieBlog'
+            };
+
+            // --- DOM 元素获取 ---
             const generateBtn = document.getElementById('generateButton');
             const exportBtn = document.getElementById('exportButton');
+            const ticketElements = {
+                title: document.getElementById('ticketTitle'),
+                poster: document.getElementById('ticketPoster'),
+                director: document.getElementById('ticketDirector'),
+                score: document.getElementById('ticketScore'),
+                type: document.getElementById('ticketType'),
+                quote: document.getElementById('ticketQuote'),
+                date: document.getElementById('ticketDate'),
+                location: document.getElementById('ticketLocation'),
+                stubId: document.getElementById('ticketStubId'),
+                review: document.getElementById('ticketReview'),
+                signature: document.getElementById('ticketSignature'),
+                container: document.getElementById('movieTicket')
+            };
+            const formElements = {
+                title: document.getElementById('title'),
+                poster: document.getElementById('poster'),
+                director: document.getElementById('director'),
+                myScore: document.getElementById('myScore'),
+                type: document.getElementById('type'),
+                quote: document.getElementById('quote'),
+                dateFrom: document.getElementById('dateFrom'),
+                dateTo: document.getElementById('dateTo'),
+                location: document.getElementById('location'),
+                stubId: document.getElementById('stubId'),
+                review: document.getElementById('review'),
+                signature: document.getElementById('signature')
+            };
 
-            // 票根上的 DOM 元素
-            const ticketTitle = document.getElementById('ticketTitle');
-            const ticketPoster = document.getElementById('ticketPoster');
-            const ticketScore = document.getElementById('ticketScore');
-            const ticketQuote = document.getElementById('ticketQuote');
-            const ticketDate = document.getElementById('ticketDate');
-            const ticketLocation = document.getElementById('ticketLocation');
-            const ticketStubId = document.getElementById('ticketStubId');
-            const ticketReview = document.getElementById('ticketReview');
-            const ticketContainer = document.getElementById('movieTicket');
+            // 初始化表单默认值
+            Object.keys(formElements).forEach(key => {
+                if (formElements[key].value === '') {
+                    formElements[key].value = DEFAULT_VALUES[key];
+                }
+            });
 
-            // 输入表单上的 DOM 元素
-            const formTitle = document.getElementById('title');
-            const formPoster = document.getElementById('poster');
-            const formScore = document.getElementById('myScore');
-            const formQuote = document.getElementById('quote');
-            const formDate = document.getElementById('date');
-            const formLocation = document.getElementById('location');
-            const formStubId = document.getElementById('stubId');
-            const formReview = document.getElementById('review');
+            /**
+             * 将数字评分转换为带样式的星星HTML元素
+             * @param {number} score - 评分（1-10）
+             * @returns {string} 星星HTML字符串
+             */
+            const getStarsFromScore = (score) => {
+                const maxStars = 5;
+                const starScore = Math.max(0, Math.min(10, score)) / 2;
+                
+                const fullStars = Math.floor(starScore);
+                const hasHalfStar = starScore % 1 >= 0.5;
+                const emptyStars = maxStars - fullStars - (hasHalfStar ? 1 : 0);
+
+                let starsHTML = '';
+                for (let i = 0; i < fullStars; i++) {
+                    starsHTML += '<span class="star">★</span>';
+                }
+                if (hasHalfStar) {
+                    starsHTML += '<span class="star half">★</span>';
+                }
+                for (let i = 0; i < emptyStars; i++) {
+                    starsHTML += '<span class="star empty">☆</span>';
+                }
+                
+                return starsHTML;
+            };
+            
+            /**
+             * 格式化日期为 MM-DD 格式
+             * @param {string} dateString - 日期字符串 (YYYY-MM-DD)
+             * @returns {string} 格式化后的日期 (MM-DD)
+             */
+            const formatDate = (dateString) => {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
+            };
 
             /**
              * 更新票根内容
              */
             const updateTicket = () => {
-                // 文本内容
-                ticketTitle.textContent = formTitle.value;
-                ticketScore.innerHTML = `<span class="score-icon">🌟</span> ${parseFloat(formScore.value).toFixed(1)} / 10`;
-                // 修改点 2: 在台词前后添加双引号
-                ticketQuote.textContent = `"${formQuote.value}"`;
-                ticketDate.textContent = formDate.value;
-                ticketLocation.textContent = formLocation.value;
-                ticketStubId.textContent = formStubId.value;
-                ticketReview.textContent = formReview.value;
+                ticketElements.title.textContent = formElements.title.value;
+                ticketElements.director.textContent = `导演: ${formElements.director.value}`;
+                
+                const score = parseFloat(formElements.myScore.value);
+                ticketElements.score.innerHTML = getStarsFromScore(score);
 
-                // 图片处理
-                ticketPoster.src = formPoster.value;
-                ticketPoster.onerror = function() {
-                    ticketPoster.src = 'https://via.placeholder.com/150x225?text=Poster+Load+Error';
+                // 处理新增的“类型”字段
+                ticketElements.type.textContent = formElements.type.value;
+
+                // 处理更新后的“观看日期”字段
+                const fromDate = formatDate(formElements.dateFrom.value);
+                const toDate = formatDate(formElements.dateTo.value);
+                ticketElements.date.textContent = fromDate === toDate ? fromDate : `${fromDate} - ${toDate}`;
+
+                ticketElements.quote.textContent = `"${formElements.quote.value}"`;
+                ticketElements.location.textContent = formElements.location.value;
+                ticketElements.stubId.textContent = formElements.stubId.value;
+                ticketElements.review.textContent = formElements.review.value;
+                ticketElements.signature.textContent = formElements.signature.value;
+
+                ticketElements.poster.src = formElements.poster.value;
+                ticketElements.poster.alt = `${formElements.title.value} 的海报`;
+                ticketElements.poster.onerror = function() {
+                    this.src = 'https://via.placeholder.com/150x225?text=海报加载失败';
                 };
             };
 
@@ -347,17 +459,17 @@
              * 导出为 PNG 图片
              */
             const exportTicket = () => {
-                updateTicket(); // 确保票根是最新状态
+                updateTicket();
                 exportBtn.disabled = true;
                 exportBtn.textContent = '生成中...';
 
-                html2canvas(ticketContainer, {
+                html2canvas(ticketElements.container, {
                     scale: 2,
                     useCORS: true,
                     backgroundColor: null
                 }).then(canvas => {
                     const link = document.createElement('a');
-                    link.download = `movie_stub_${formTitle.value.substring(0, 10)}.png`;
+                    link.download = `电影票根_${formElements.title.value.substring(0, 10)}.png`;
                     link.href = canvas.toDataURL('image/png');
                     link.click();
                     exportBtn.disabled = false;
