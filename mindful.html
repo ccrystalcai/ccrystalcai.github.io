@@ -45,22 +45,28 @@
     <div class="source" id="source">给此刻一点安静</div>
   </main>
   <div class="status" id="status" aria-live="off"></div>
+
   <script>
-    // Set these to your Supabase project values after deploying the Edge Function.
-    const API_URL = "";
-    const SUPABASE_PUBLISHABLE_KEY = "";
-    const REFRESH_MS = 10 * 60 * 1000;
+    // Supabase Edge Function 地址；部署到其他项目时请替换为对应地址。
+    const API_URL = "https://kmvdqhsomcvowqqszshk.supabase.co/functions/v1/mindful-quote";
+    // 部署前请替换为 Supabase Publishable Key（sb_publishable_...），不要填写 Secret 或 service_role key。
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KsrxFQ0GwJysxeY_2TdtxQ_pwkh0_oE";
+    const REFRESH_MS = 15 * 60 * 1000;
+
     const fallback = [
       "我允许自己慢下来，回到此刻。", "每一次呼吸，都是新的开始。", "我可以带着温柔面对今天。",
       "此刻的我，已经足够。", "我不必一次解决所有事情。", "先照顾好此刻的自己。",
       "我愿意接纳此刻真实的感受。", "把注意力放回呼吸，心也会慢慢安定。",
       "我可以一步一步来。", "生活正在一点一点展开。", "我值得被理解，也值得被善待。"
     ];
+
     const quoteEl = document.getElementById("quote");
     const sourceEl = document.getElementById("source");
     const statusEl = document.getElementById("status");
     let lastQuote = "";
     let lastPalette = -1;
+    let refreshInProgress = false;
+
     const palettes = [
       ["rgba(18,112,121,.83)", "rgba(55,142,145,.56)", "rgba(137,186,181,.27)", "rgba(205,225,219,.62)"],
       ["rgba(105,82,151,.78)", "rgba(151,128,185,.53)", "rgba(203,185,218,.30)", "rgba(229,219,237,.66)"],
@@ -82,35 +88,75 @@
     }
 
     function show(quote, source) {
-      if (!quote) return;
+      const cleanQuote = typeof quote === "string" ? quote.trim() : "";
+      if (!cleanQuote) return false;
+
       changeGlow();
       quoteEl.style.animation = "none";
       void quoteEl.offsetWidth;
       quoteEl.style.animation = "";
-      quoteEl.textContent = quote;
+      quoteEl.textContent = cleanQuote;
       sourceEl.textContent = source || "仪表盘 · 每日一句";
-      lastQuote = quote;
+      lastQuote = cleanQuote;
+      return true;
     }
+
     function showFallback() {
       const choices = fallback.filter(item => item !== lastQuote);
-      show(choices[Math.floor(Math.random() * choices.length)] || fallback[0], "正念语句");
+      const quote = choices[Math.floor(Math.random() * choices.length)] || fallback[0];
+      show(quote, "正念语句 · 内置语句库");
     }
+
+    function getSource(data) {
+      const date = typeof data.date === "string" ? data.date.trim() : "";
+      const source = typeof data.source === "string" ? data.source.trim() : "Notion · 历史正念语句";
+      return date ? `${source} · ${date}` : source;
+    }
+
+    async function requestQuote() {
+      const headers = {};
+      const key = SUPABASE_PUBLISHABLE_KEY.trim();
+      if (key && !key.startsWith("请替换")) headers.apikey = key;
+
+      const response = await fetch(API_URL, { method: "GET", cache: "no-store", headers });
+      if (!response.ok) throw new Error(`请求失败：${response.status}`);
+      const data = await response.json();
+      if (!data || typeof data.quote !== "string" || !data.quote.trim()) {
+        throw new Error("接口没有返回有效语句");
+      }
+      return data;
+    }
+
     async function refresh() {
-      if (!API_URL) { showFallback(); statusEl.textContent = ""; return; }
+      if (refreshInProgress) return;
+      refreshInProgress = true;
+      statusEl.textContent = "正在更新…";
+
       try {
-        const response = await fetch(API_URL, {
-          cache: "no-store",
-          headers: SUPABASE_PUBLISHABLE_KEY ? { "apikey": SUPABASE_PUBLISHABLE_KEY } : {}
-        });
-        if (!response.ok) throw new Error("服务暂不可用");
-        const data = await response.json();
-        show(data.quote, data.date ? `仪表盘 · ${data.date}` : "仪表盘 · 每日一句");
+        if (!API_URL.trim()) throw new Error("未配置接口地址");
+        const data = await requestQuote();
+
+        // 若服务连续返回相同内容，再请求一次；仍重复时改用不同的本地备用语句。
+        if (data.quote.trim() === lastQuote) {
+          const retryData = await requestQuote();
+          if (retryData.quote.trim() === lastQuote) {
+            showFallback();
+            statusEl.textContent = "接口返回了重复语句，暂时显示备用正念语句";
+            return;
+          }
+          show(retryData.quote, getSource(retryData));
+        } else {
+          show(data.quote, getSource(data));
+        }
         statusEl.textContent = "";
-      } catch (_) {
+      } catch (error) {
         showFallback();
-        statusEl.textContent = "暂时显示正念语句";
+        statusEl.textContent = "暂时显示备用正念语句";
+      } finally {
+        refreshInProgress = false;
       }
     }
+
     refresh();
     window.setInterval(refresh, REFRESH_MS);
   </script>
