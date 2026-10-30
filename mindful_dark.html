@@ -121,11 +121,8 @@
     }
 
     function getSource(data) {
-      const date = typeof data.date === "string" ? data.date.trim() : "";
-      const source = typeof data.source === "string" ? data.source.trim() : "";
-      if (source && date) return `${source} · ${date}`;
-      return source || date;
-    }
+  return typeof data.source === "string" ? data.source.trim() : "";
+}
 
     async function requestQuote() {
       const headers = {};
