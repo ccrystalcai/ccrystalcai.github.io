@@ -31,6 +31,7 @@
       text-shadow: 0 1px 14px rgba(5, 47, 52, .28);
       animation: arrive .8s ease both;
     }
+    .datetime { margin-bottom: 18px; color: rgba(255,255,255,.82); font-size: 13px; letter-spacing: .12em; font-variant-numeric: tabular-nums; text-shadow: 0 1px 10px rgba(5,47,52,.2); }
     .source { margin-top: 28px; color: rgba(255,255,255,.82); font-size: 12px; letter-spacing: .16em; }
     .status { position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 0; width: 100%; text-align: center; color: rgba(68,91,91,.56); font-size: 11px; letter-spacing: .08em; }
     @keyframes breathe { to { transform: scale(1.14); opacity: .83; } }
@@ -41,8 +42,9 @@
 <body>
   <div class="wash" aria-hidden="true"></div>
   <main aria-live="polite" aria-atomic="true">
+    <div class="datetime" id="datetime" aria-live="off"></div>
     <p id="quote">慢慢来，感受此刻。</p>
-    <div class="source" id="source">给此刻一点安静</div>
+    <div class="source" id="source" hidden></div>
   </main>
   <div class="status" id="status" aria-live="off"></div>
 
@@ -51,7 +53,7 @@
     const API_URL = "https://kmvdqhsomcvowqqszshk.supabase.co/functions/v1/mindful-quote";
     // 部署前请替换为 Supabase Publishable Key（sb_publishable_...），不要填写 Secret 或 service_role key。
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KsrxFQ0GwJysxeY_2TdtxQ_pwkh0_oE";
-    const REFRESH_MS = 15 * 60 * 1000;
+    const REFRESH_MS = 10 * 60 * 1000;
 
     const fallback = [
       "我允许自己慢下来，回到此刻。", "每一次呼吸，都是新的开始。", "我可以带着温柔面对今天。",
@@ -60,6 +62,7 @@
       "我可以一步一步来。", "生活正在一点一点展开。", "我值得被理解，也值得被善待。"
     ];
 
+    const datetimeEl = document.getElementById("datetime");
     const quoteEl = document.getElementById("quote");
     const sourceEl = document.getElementById("source");
     const statusEl = document.getElementById("status");
@@ -75,6 +78,17 @@
       ["rgba(91,125,92,.78)", "rgba(139,169,132,.53)", "rgba(190,211,176,.30)", "rgba(224,235,211,.66)"],
       ["rgba(173,129,57,.77)", "rgba(204,168,99,.51)", "rgba(230,205,151,.29)", "rgba(244,232,201,.67)"]
     ];
+
+    function updateDateTime() {
+      const now = new Date();
+      const date = new Intl.DateTimeFormat("zh-CN", {
+        year: "numeric", month: "long", day: "numeric", weekday: "long"
+      }).format(now);
+      const time = new Intl.DateTimeFormat("zh-CN", {
+        hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+      }).format(now);
+      datetimeEl.textContent = `${date} · ${time}`;
+    }
 
     function changeGlow() {
       const options = palettes.map((_, index) => index).filter(index => index !== lastPalette);
@@ -96,7 +110,8 @@
       void quoteEl.offsetWidth;
       quoteEl.style.animation = "";
       quoteEl.textContent = cleanQuote;
-      sourceEl.textContent = source || "仪表盘 · 每日一句";
+      sourceEl.textContent = source || "";
+      sourceEl.hidden = !sourceEl.textContent;
       lastQuote = cleanQuote;
       return true;
     }
@@ -104,13 +119,14 @@
     function showFallback() {
       const choices = fallback.filter(item => item !== lastQuote);
       const quote = choices[Math.floor(Math.random() * choices.length)] || fallback[0];
-      show(quote, "正念语句 · 内置语句库");
+      show(quote, "");
     }
 
     function getSource(data) {
       const date = typeof data.date === "string" ? data.date.trim() : "";
-      const source = typeof data.source === "string" ? data.source.trim() : "Notion · 历史正念语句";
-      return date ? `${source} · ${date}` : source;
+      const source = typeof data.source === "string" ? data.source.trim() : "";
+      if (source && date) return `${source} · ${date}`;
+      return source || date;
     }
 
     async function requestQuote() {
@@ -157,6 +173,8 @@
       }
     }
 
+    updateDateTime();
+    window.setInterval(updateDateTime, 1000);
     refresh();
     window.setInterval(refresh, REFRESH_MS);
   </script>
