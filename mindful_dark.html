@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#191919">
   <meta name="description" content="给此刻一点安静，一句正念语句。">
   <title>正念语句</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,24 +14,23 @@
     * { box-sizing: border-box; }
     html, body { width: 100%; min-height: 100%; margin: 0; }
     body {
-      min-height: 100svh; display: grid; place-items: center; overflow: hidden;
+      min-height: 100svh; display: flex; align-items: center; justify-content: center; overflow-x: hidden; overflow-y: auto;
       color: #fff; background: #191919;
     }
     .wash {
-      position: fixed; inset: -24%; pointer-events: none;
+      position: fixed; inset: -50%; pointer-events: none;
       background:
-        radial-gradient(ellipse 38% 34% at 50% 49%, var(--glow-core), var(--glow-mid) 42%, var(--glow-outer) 72%, transparent 100%),
-        radial-gradient(ellipse 56% 50% at 50% 49%, var(--glow-halo), transparent 80%);
-      filter: blur(42px); transform: scale(1.04); animation: breathe 18s ease-in-out infinite alternate;
+        radial-gradient(circle 44vmin at 50% 49%, var(--glow-core) 0%, var(--glow-mid) 44%, var(--glow-outer) 82%, transparent 100%),
+        radial-gradient(circle 62vmin at 50% 49%, var(--glow-halo) 0%, transparent 100%);
+      filter: blur(40px); transform: scale(1.04); animation: breathe 18s ease-in-out infinite alternate;
     }
-    main { position: relative; width: min(760px, 100%); padding: 34px 28px; text-align: center; }
+    main { position: relative; flex: 0 0 auto; width: min(760px, 100%); padding: 34px 28px; text-align: center; }
     #quote {
-      margin: 0 auto; max-width: 680px; font-size: clamp(24px, 5.7vw, 40px);
-      font-weight: 400; line-height: 1.72; letter-spacing: .045em;
+      margin: 0 auto; max-width: 680px; font-size: clamp(21px, 5vw, 34px);
+      font-weight: 400; line-height: 1.65; letter-spacing: .045em; overflow-wrap: anywhere; text-wrap: pretty;
       text-shadow: 0 1px 14px rgba(5, 47, 52, .28);
       animation: arrive .8s ease both;
     }
-    .datetime { margin-bottom: 20px; color: rgba(255,255,255,.88); font-size: clamp(15px, 3vw, 18px); letter-spacing: .12em; font-variant-numeric: tabular-nums; text-shadow: 0 1px 10px rgba(5,47,52,.2); }
     .source { margin-top: 28px; color: rgba(255,255,255,.82); font-size: 12px; letter-spacing: .16em; }
     .status { position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 0; width: 100%; text-align: center; color: rgba(255,255,255,.66); font-size: 11px; letter-spacing: .08em; }
     @keyframes breathe { to { transform: scale(1.14); opacity: .83; } }
@@ -42,7 +41,6 @@
 <body>
   <div class="wash" aria-hidden="true"></div>
   <main aria-live="polite" aria-atomic="true">
-    <div class="datetime" id="datetime" aria-live="off"></div>
     <p id="quote">慢慢来，感受此刻。</p>
     <div class="source" id="source" hidden></div>
   </main>
@@ -52,7 +50,7 @@
     const API_URL = "https://kmvdqhsomcvowqqszshk.supabase.co/functions/v1/mindful-quote";
     // 部署前请替换为 Supabase Publishable Key（sb_publishable_...），不要填写 Secret 或 service_role key。
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KsrxFQ0GwJysxeY_2TdtxQ_pwkh0_oE";
-    const REFRESH_MS = 10 * 60 * 1000;
+    const REFRESH_MS = 15 * 60 * 1000;
 
     const fallback = [
       "我允许自己慢下来，回到此刻。", "每一次呼吸，都是新的开始。", "我可以带着温柔面对今天。",
@@ -61,7 +59,6 @@
       "我可以一步一步来。", "生活正在一点一点展开。", "我值得被理解，也值得被善待。"
     ];
 
-    const datetimeEl = document.getElementById("datetime");
     const quoteEl = document.getElementById("quote");
     const sourceEl = document.getElementById("source");
     let lastQuote = "";
@@ -77,17 +74,6 @@
       ["rgba(173,129,57,.77)", "rgba(204,168,99,.51)", "rgba(230,205,151,.29)", "rgba(244,232,201,.67)"]
     ];
 
-    function updateDateTime() {
-      const now = new Date();
-      const date = new Intl.DateTimeFormat("zh-CN", {
-        year: "numeric", month: "long", day: "numeric", weekday: "long"
-      }).format(now);
-      const time = new Intl.DateTimeFormat("zh-CN", {
-        hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
-      }).format(now);
-      datetimeEl.textContent = `${date} · ${time}`;
-    }
-
     function changeGlow() {
       const options = palettes.map((_, index) => index).filter(index => index !== lastPalette);
       lastPalette = options[Math.floor(Math.random() * options.length)];
@@ -99,6 +85,18 @@
       wash.style.setProperty("--glow-halo", halo);
     }
 
+    function fitQuoteText() {
+      // Use the CSS responsive size by default; reduce it only if a long quote is too tall for the embed.
+      quoteEl.style.fontSize = "";
+      let size = parseFloat(getComputedStyle(quoteEl).fontSize);
+      const minSize = 18;
+      const maxHeight = Math.max(120, window.innerHeight * 0.52);
+      while (quoteEl.scrollHeight > maxHeight && size > minSize) {
+        size -= 1;
+        quoteEl.style.fontSize = `${size}px`;
+      }
+    }
+
     function show(quote, source) {
       const cleanQuote = typeof quote === "string" ? quote.trim() : "";
       if (!cleanQuote) return false;
@@ -108,6 +106,7 @@
       void quoteEl.offsetWidth;
       quoteEl.style.animation = "";
       quoteEl.textContent = cleanQuote;
+      fitQuoteText();
       sourceEl.textContent = source || "";
       sourceEl.hidden = !sourceEl.textContent;
       lastQuote = cleanQuote;
@@ -121,8 +120,8 @@
     }
 
     function getSource(data) {
-  return typeof data.source === "string" ? data.source.trim() : "";
-}
+      return typeof data.source === "string" ? data.source.trim() : "";
+    }
 
     async function requestQuote() {
       const headers = {};
@@ -164,8 +163,7 @@
       }
     }
 
-    updateDateTime();
-    window.setInterval(updateDateTime, 1000);
+    window.addEventListener("resize", fitQuoteText);
     refresh();
     window.setInterval(refresh, REFRESH_MS);
   </script>
