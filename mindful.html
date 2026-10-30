@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7faf9">
+  <meta name="description" content="给此刻一点安静，一句正念语句。">
+  <title>正念语句</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light; font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; min-height: 100%; margin: 0; }
+    body {
+      min-height: 100svh; display: grid; place-items: center; overflow: hidden;
+      color: #fff; background: #f7faf9;
+    }
+    .wash {
+      position: fixed; inset: -15%; pointer-events: none;
+      background:
+        radial-gradient(ellipse 32% 29% at 50% 49%, var(--glow-core), var(--glow-mid) 40%, var(--glow-outer) 68%, transparent 100%),
+        radial-gradient(ellipse 46% 42% at 50% 49%, var(--glow-halo), transparent 72%);
+      filter: blur(27px); transform: scale(1.06); animation: breathe 18s ease-in-out infinite alternate;
+    }
+    main { position: relative; width: min(760px, 100%); padding: 34px 28px; text-align: center; }
+    #quote {
+      margin: 0 auto; max-width: 680px; font-size: clamp(26px, 6.1vw, 44px);
+      font-weight: 400; line-height: 1.72; letter-spacing: .045em;
+      text-shadow: 0 1px 14px rgba(5, 47, 52, .28);
+      animation: arrive .8s ease both;
+    }
+    .source { margin-top: 28px; color: rgba(255,255,255,.82); font-size: 12px; letter-spacing: .16em; }
+    .status { position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 0; width: 100%; text-align: center; color: rgba(68,91,91,.56); font-size: 11px; letter-spacing: .08em; }
+    @keyframes breathe { to { transform: scale(1.14); opacity: .83; } }
+    @keyframes arrive { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
+  </style>
+</head>
+<body>
+  <div class="wash" aria-hidden="true"></div>
+  <main aria-live="polite" aria-atomic="true">
+    <p id="quote">慢慢来，感受此刻。</p>
+    <div class="source" id="source">给此刻一点安静</div>
+  </main>
+  <div class="status" id="status" aria-live="off"></div>
+  <script>
+    // Set these to your Supabase project values after deploying the Edge Function.
+    const API_URL = "";
+    const SUPABASE_PUBLISHABLE_KEY = "";
+    const REFRESH_MS = 10 * 60 * 1000;
+    const fallback = [
+      "我允许自己慢下来，回到此刻。", "每一次呼吸，都是新的开始。", "我可以带着温柔面对今天。",
+      "此刻的我，已经足够。", "我不必一次解决所有事情。", "先照顾好此刻的自己。",
+      "我愿意接纳此刻真实的感受。", "把注意力放回呼吸，心也会慢慢安定。",
+      "我可以一步一步来。", "生活正在一点一点展开。", "我值得被理解，也值得被善待。"
+    ];
+    const quoteEl = document.getElementById("quote");
+    const sourceEl = document.getElementById("source");
+    const statusEl = document.getElementById("status");
+    let lastQuote = "";
+    let lastPalette = -1;
+    const palettes = [
+      ["rgba(18,112,121,.83)", "rgba(55,142,145,.56)", "rgba(137,186,181,.27)", "rgba(205,225,219,.62)"],
+      ["rgba(105,82,151,.78)", "rgba(151,128,185,.53)", "rgba(203,185,218,.30)", "rgba(229,219,237,.66)"],
+      ["rgba(183,104,91,.76)", "rgba(211,145,124,.51)", "rgba(237,194,171,.29)", "rgba(246,225,211,.67)"],
+      ["rgba(55,105,157,.80)", "rgba(103,150,190,.54)", "rgba(171,203,220,.30)", "rgba(218,233,239,.67)"],
+      ["rgba(91,125,92,.78)", "rgba(139,169,132,.53)", "rgba(190,211,176,.30)", "rgba(224,235,211,.66)"],
+      ["rgba(173,129,57,.77)", "rgba(204,168,99,.51)", "rgba(230,205,151,.29)", "rgba(244,232,201,.67)"]
+    ];
+
+    function changeGlow() {
+      const options = palettes.map((_, index) => index).filter(index => index !== lastPalette);
+      lastPalette = options[Math.floor(Math.random() * options.length)];
+      const [core, mid, outer, halo] = palettes[lastPalette];
+      const wash = document.querySelector(".wash");
+      wash.style.setProperty("--glow-core", core);
+      wash.style.setProperty("--glow-mid", mid);
+      wash.style.setProperty("--glow-outer", outer);
+      wash.style.setProperty("--glow-halo", halo);
+    }
+
+    function show(quote, source) {
+      if (!quote) return;
+      changeGlow();
+      quoteEl.style.animation = "none";
+      void quoteEl.offsetWidth;
+      quoteEl.style.animation = "";
+      quoteEl.textContent = quote;
+      sourceEl.textContent = source || "仪表盘 · 每日一句";
+      lastQuote = quote;
+    }
+    function showFallback() {
+      const choices = fallback.filter(item => item !== lastQuote);
+      show(choices[Math.floor(Math.random() * choices.length)] || fallback[0], "正念语句");
+    }
+    async function refresh() {
+      if (!API_URL) { showFallback(); statusEl.textContent = ""; return; }
+      try {
+        const response = await fetch(API_URL, {
+          cache: "no-store",
+          headers: SUPABASE_PUBLISHABLE_KEY ? { "apikey": SUPABASE_PUBLISHABLE_KEY } : {}
+        });
+        if (!response.ok) throw new Error("服务暂不可用");
+        const data = await response.json();
+        show(data.quote, data.date ? `仪表盘 · ${data.date}` : "仪表盘 · 每日一句");
+        statusEl.textContent = "";
+      } catch (_) {
+        showFallback();
+        statusEl.textContent = "暂时显示正念语句";
+      }
+    }
+    refresh();
+    window.setInterval(refresh, REFRESH_MS);
+  </script>
+</body>
+</html>
