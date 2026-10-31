@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#171519">
+<title>My Life · Daily Widget</title>
+
+<style>
+:root {
+  --bg: #171519;
+  --panel: #29252b;
+  --pink: #d99baf;
+  --pink-light: #e6a0b7;
+  --text: #f8eff2;
+  --muted: #b9aeb3;
+  --soft: #f5e9ec;
+  --soft-text: #503c45;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px 12px;
+  min-height: 100vh;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--text);
+}
+
+.widget {
+  width: 100%;
+  max-width: 560px;
+  margin: auto;
+  padding: 24px;
+  background: var(--bg);
+  border-radius: 26px;
+  overflow: hidden;
+}
+
+/* 顶部标题 */
+
+.eyebrow {
+  margin: 0 0 17px;
+  color: var(--pink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 23px;
+}
+
+.greeting h1 {
+  margin: 0 0 8px;
+  font-size: clamp(29px, 7vw, 38px);
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* 玫瑰装饰 */
+
+.flower-tile {
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: #382833;
+}
+
+.flower-tile svg {
+  width: 27px;
+  height: 27px;
+  fill: none;
+  stroke: var(--pink-light);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 日期天气卡片 */
+
+.card {
+  padding: 20px;
+  margin-bottom: 15px;
+  background: var(--panel);
+  border-radius: 21px;
+}
+
+.date-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.weekday {
+  margin: 0 0 8px;
+  color: var(--pink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.date {
+  margin: 0 0 7px;
+  font-size: 34px;
+  font-weight: 750;
+  letter-spacing: -1px;
+}
+
+.lunar {
+  margin: 0;
+  color: #c7b9c0;
+  font-size: 13px;
+}
+
+.clock {
+  padding-top: 20px;
+  text-align: right;
+}
+
+.time {
+  font-size: clamp(23px, 6vw, 31px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.local {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.divider {
+  height: 1px;
+  margin: 21px 0;
+  background: #d99baf30;
+}
+
+/* 天气 */
+
+.weather {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.weather-icon {
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: var(--pink-light);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.temperature {
+  font-size: 30px;
+  font-weight: 750;
+  line-height: 1.1;
+}
+
+.weather-detail {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.city {
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.city strong {
+  font-size: 16px;
+}
+
+.city span {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* 正念卡片 */
+
+.mindful {
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 21px;
+  background: linear-gradient(135deg, #f7e9ed, #f1dfe5);
+  color: var(--soft-text);
+}
+
+.mindful-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mindful-label {
+  color: #b9788d;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 1.5px;
+}
+
+.sun-icon {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: #b77d90;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+
+.quote {
+  margin: 15px 0 17px;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+.mindful-divider {
+  height: 1px;
+  margin-bottom: 12px;
+  background: #987a853d;
+}
+
+.mindful-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #987a85;
+  font-size: 10px;
+}
+
+/* 倒计时 */
+
+.countdowns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.count-card {
+  min-width: 0;
+  padding: 17px;
+  background: var(--panel);
+  border-radius: 20px;
+}
+
+.count-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 14px;
+  color: #c7b9c0;
+  font-size: 12px;
+}
+
+.count-label svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--pink);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.count-number {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 13px;
+}
+
+.count-number strong {
+  font-size: 43px;
+  line-height: 1;
+  font-weight: 750;
+  letter-spacing: -2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.count-number span {
+  color: #c7b9c0;
+  font-size: 15px;
+}
+
+.progress-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 9px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.progress-value {
+  color: var(--text);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.progress-value small {
+  color: #c7b9c0;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.track {
+  height: 5px;
+  overflow: hidden;
+  background: #51434b;
+  border-radius: 20px;
+}
+
+.fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #c77f98, #e29eb4);
+  border-radius: 20px;
+  transition: width .4s;
+}
+
+.note {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.goal-desc {
+  margin: 0 0 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.goal-name {
+  color: var(--pink);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* 页脚 */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 26px;
+  color: #b9aeb3;
+  font-size: 10px;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.footer::before,
+.footer::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: #d99baf40;
+}
+
+/* 手机适配 */
+
+@media (max-width: 390px) {
+  .widget {
+    padding: 18px;
+  }
+
+  .card,
+  .mindful {
+    padding: 16px;
+  }
+
+  .countdowns {
+    gap: 9px;
+  }
+
+  .count-card {
+    padding: 14px 12px;
+  }
+
+  .weather-detail {
+    font-size: 10px;
+  }
+
+  .city strong {
+    font-size: 14px;
+  }
+
+  .mindful-footer {
+    font-size: 9px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="widget">
+
+  <p class="eyebrow">MY LIFE · DAILY WIDGET</p>
+
+  <!-- 顶部问候 -->
+  <header class="greeting">
+    <div>
+      <h1>Good morning.</h1>
+      <p class="subtitle">慢一点也没关系，继续向前就好。</p>
+    </div>
+
+    <!-- 精致玫瑰线稿 -->
+    <div class="flower-tile">
+      <svg viewBox="0 0 32 32">
+        <path d="M15.8 13.2c-3.8-1.2-5.1-4.6-3.4-7.1
+        1.2-1.8 3.7-2.1 5.1-.6
+        1.2-1.6 3.8-1.6 5 .1
+        1.9 2.6.1 6.2-3.8 7.5
+        -1 .3-2 .3-2.9.1Z"/>
+        <path d="M14.7 13.1c-.2-2.3 1.1-4.2 3.1-5.1
+        1.4 1.5 1.4 3.5.2 5"/>
+        <path d="M16 13.5c.1 4.8-.4 9.1-1.5 13.1
+        M15.1 19.5c-3.2-.2-5.4-1.8-6.4-4.2
+        3.1-.2 5.2 1.1 6.4 4.2
+        M14.8 22.2c2.9-2.1 5.5-2.1 7.6-.8
+        -1.5 2.4-4.1 3.4-7.6 3.1
+        M10 27h12"/>
+      </svg>
+    </div>
+  </header>
+
+  <!-- 日期与天气 -->
+  <section class="card">
+
+    <div class="date-row">
+      <div>
+        <p class="weekday" id="weekday">SATURDAY · 2026</p>
+        <p class="date" id="date">10月31日</p>
+        <p class="lunar">农历九月廿一</p>
+      </div>
+
+      <div class="clock">
+        <div class="time" id="clock">09:30:25</div>
+        <div class="local">LOCAL TIME</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="weather">
+
+      <svg class="weather-icon" viewBox="0 0 48 48">
+        <circle cx="29" cy="15" r="6"/>
+        <path d="M29 3v4M29 23v4M17 15h-4M45 15h-4
+        M20.5 6.5l-2.8-2.8M37.3 23.3l-2.8-2.8
+        M37.5 6.5l2.8-2.8"/>
+        <path d="M10 36.5h24a7 7 0 0 0 .2-14
+        10.5 10.5 0 0 0-20.1 2.8A5.7 5.7
+        0 0 0 10 36.5Z"/>
+      </svg>
+
+      <div>
+        <div class="temperature">22°C</div>
+        <div class="weather-detail">
+          多云 · 紫外线 2（低） · 湿度 65%
+        </div>
+      </div>
+
+      <div class="city">
+        <strong>武汉</strong>
+        <span>天气实况</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 正念语句 -->
+  <section class="mindful">
+
+    <div class="mindful-top">
+      <span class="mindful-label">MINDFUL MOMENT</span>
+
+      <svg class="sun-icon" viewBox="0 0 28 28">
+        <circle cx="14" cy="13" r="5.5"/>
+        <path d="M14 2v3M14 21v3M3 13h3M22 13h3
+        M6.2 5.2l2.1 2.1M19.7 18.7l2.1 2.1
+        M21.8 5.2l-2.1 2.1M8.3 18.7l-2.1 2.1
+        M9 25h10"/>
+      </svg>
+    </div>
+
+    <p class="quote" id="quote" aria-live="polite">
+      把注意力放回当下，认真过好眼前这一刻。
+    </p>
+
+    <div class="mindful-divider"></div>
+
+    <div class="mindful-footer">
+      <span id="quote-source">正念语句 · 内置语录</span>
+      <span>A MOMENT FOR YOURSELF</span>
+    </div>
+
+  </section>
+
+  <!-- 双倒计时 -->
+  <section class="countdowns">
+
+    <article class="count-card">
+
+      <div class="count-label">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="5" width="18" height="16" rx="2"/>
+          <path d="M7 3v4M17 3v4M3 10h18"/>
+        </svg>
+        <span>年度倒计时</span>
+      </div>
+
+      <div class="count-number">
+        <strong id="year-days">61</strong>
+        <span>天</span>
+      </div>
+
+      <div class="progress-line">
+        <span>年度进度</span>
+        <span class="progress-value">
+          <b id="year-percent">83</b><small>%</small>
+        </span>
+      </div>
+
+      <div class="track">
+        <div class="fill" id="year-fill"></div>
+      </div>
+
+      <p class="note">把今年过好</p>
+
+    </article>
+
+    <article class="count-card">
+
+      <div class="count-label">
+        <svg viewBox="0 0 24 24">
+          <path d="M5 21V4M5 5h13l-2.5 4L18 13H5"/>
+        </svg>
+        <span>最近目标</span>
+      </div>
+
+      <div class="count-number">
+        <strong id="goal-days">12</strong>
+        <span>天</span>
+      </div>
+
+      <p class="goal-desc">距离下一个目标</p>
+      <div class="goal-name" id="goal-name">
+        目标名称 · 动态读取
+      </div>
+
+    </article>
+
+  </section>
+
+  <footer class="footer">
+    A LITTLE BETTER EVERY DAY ✦
+  </footer>
+
+</main>
+
+<script>
+/* Supabase Edge Function：语录由函数从 Notion 读取 */
+const QUOTE_FUNCTION_URL =
+  "https://kmvdqhsomcvowqqszshk.supabase.co/functions/v1/mindful-quote";
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_KsrxFQ0GwJysxeY_2TdtxQ_pwkh0_oE";
+
+async function loadMindfulQuote() {
+  const quoteElement = document.getElementById("quote");
+  const sourceElement = document.getElementById("quote-source");
+
+  try {
+    const response = await fetch(QUOTE_FUNCTION_URL, {
+      method: "GET",
+      headers: {
+        "apikey": SUPABASE_PUBLISHABLE_KEY,
+        "Authorization": `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+        "Accept": "application/json"
+      },
+      cache: "no-store"
+    });
+
+    if (!response.ok) throw new Error(`Quote request failed: ${response.status}`);
+
+    const data = await response.json();
+    if (typeof data.quote !== "string" || !data.quote.trim()) {
+      throw new Error("Quote response is empty or invalid");
+    }
+
+    quoteElement.textContent = data.quote.trim();
+    sourceElement.textContent = data.date
+      ? `正念语句 · Notion · ${data.date}`
+      : "正念语句 · Notion";
+  } catch (error) {
+    // 保留 HTML 中的内置语录，网络或函数不可用时仍能正常显示。
+    sourceElement.textContent = "正念语句 · 内置语录";
+    console.warn("Mindful quote unavailable; using built-in quote.", error);
+  }
+}
+
+/* 日期与时钟 */
+const weekdayNames = [
+  "SUNDAY","MONDAY","TUESDAY",
+  "WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"
+];
+
+function updateClock() {
+  const now = new Date();
+
+  const time = [
+    now.getHours(),
+    now.getMinutes(),
+    now.getSeconds()
+  ].map(n => String(n).padStart(2,"0")).join(":");
+
+  document.getElementById("clock").textContent = time;
+
+  document.getElementById("weekday").textContent =
+    weekdayNames[now.getDay()] + " · " + now.getFullYear();
+
+  document.getElementById("date").textContent =
+    (now.getMonth()+1) + "月" + now.getDate() + "日";
+}
+
+/* 年度倒计时和进度 */
+function updateYearProgress() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const start = new Date(year,0,1);
+  const end = new Date(year+1,0,1);
+
+  const today = new Date(year,now.getMonth(),now.getDate());
+
+  const elapsed = today - start;
+  const total = end - start;
+
+  const percent = Math.round(elapsed / total * 100);
+  const days = Math.max(
+    0,
+    Math.ceil((end - today) / 86400000) - 1
+  );
+
+  document.getElementById("year-days").textContent = days;
+  document.getElementById("year-percent").textContent = percent;
+  document.getElementById("year-fill").style.width = percent + "%";
+}
+
+/* 初始化 */
+function updateWidget() {
+  updateClock();
+  updateYearProgress();
+}
+
+updateWidget();
+setInterval(updateWidget,1000);
+loadMindfulQuote();
+
+/* 天气和最近目标目前仍是示例内容，可在后续接入对应数据源。 */
+</script>
+
+</body>
+</html>
