@@ -264,114 +264,6 @@ body {
   font-size: 10px;
 }
 
-/* 倒计时 */
-
-.countdowns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.count-card {
-  min-width: 0;
-  padding: 17px;
-  background: var(--panel);
-  border-radius: 20px;
-}
-
-.count-label {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-bottom: 14px;
-  color: #c7b9c0;
-  font-size: 12px;
-}
-
-.count-label svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: var(--pink);
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.count-number {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-bottom: 13px;
-}
-
-.count-number strong {
-  font-size: 43px;
-  line-height: 1;
-  font-weight: 750;
-  letter-spacing: -2px;
-  font-variant-numeric: tabular-nums;
-}
-
-.count-number span {
-  color: #c7b9c0;
-  font-size: 15px;
-}
-
-.progress-line {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 9px;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.progress-value {
-  color: var(--text);
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.progress-value small {
-  color: #c7b9c0;
-  font-size: 12px;
-  font-weight: 400;
-}
-
-.track {
-  height: 5px;
-  overflow: hidden;
-  background: #51434b;
-  border-radius: 20px;
-}
-
-.fill {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, #c77f98, #e29eb4);
-  border-radius: 20px;
-  transition: width .4s;
-}
-
-.note {
-  margin: 9px 0 0;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.goal-desc {
-  margin: 0 0 7px;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.goal-name {
-  color: var(--pink);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
 /* 页脚 */
 
 .footer {
@@ -406,13 +298,6 @@ body {
     padding: 16px;
   }
 
-  .countdowns {
-    gap: 9px;
-  }
-
-  .count-card {
-    padding: 14px 12px;
-  }
 
   .weather-detail {
     font-size: 10px;
@@ -438,7 +323,7 @@ body {
   <!-- 顶部问候 -->
   <header class="greeting">
     <div>
-      <h1>Good morning.</h1>
+      <h1 id="greeting-title">Good morning.</h1>
       <p class="subtitle">慢一点也没关系，继续向前就好。</p>
     </div>
 
@@ -535,62 +420,6 @@ body {
 
   </section>
 
-  <!-- 双倒计时 -->
-  <section class="countdowns">
-
-    <article class="count-card">
-
-      <div class="count-label">
-        <svg viewBox="0 0 24 24">
-          <rect x="3" y="5" width="18" height="16" rx="2"/>
-          <path d="M7 3v4M17 3v4M3 10h18"/>
-        </svg>
-        <span>年度倒计时</span>
-      </div>
-
-      <div class="count-number">
-        <strong id="year-days">61</strong>
-        <span>天</span>
-      </div>
-
-      <div class="progress-line">
-        <span>年度进度</span>
-        <span class="progress-value">
-          <b id="year-percent">83</b><small>%</small>
-        </span>
-      </div>
-
-      <div class="track">
-        <div class="fill" id="year-fill"></div>
-      </div>
-
-      <p class="note">把今年过好</p>
-
-    </article>
-
-    <article class="count-card">
-
-      <div class="count-label">
-        <svg viewBox="0 0 24 24">
-          <path d="M5 21V4M5 5h13l-2.5 4L18 13H5"/>
-        </svg>
-        <span>最近目标</span>
-      </div>
-
-      <div class="count-number">
-        <strong id="goal-days">12</strong>
-        <span>天</span>
-      </div>
-
-      <p class="goal-desc">距离下一个目标</p>
-      <div class="goal-name" id="goal-name">
-        目标名称 · 动态读取
-      </div>
-
-    </article>
-
-  </section>
-
   <footer class="footer">
     A LITTLE BETTER EVERY DAY ✦
   </footer>
@@ -645,6 +474,10 @@ const weekdayNames = [
 
 function updateClock() {
   const now = new Date();
+  const hour = now.getHours();
+
+  document.getElementById("greeting-title").textContent =
+    hour < 12 ? "Good morning." : hour < 18 ? "Good afternoon." : "Good evening.";
 
   const time = [
     now.getHours(),
@@ -661,41 +494,16 @@ function updateClock() {
     (now.getMonth()+1) + "月" + now.getDate() + "日";
 }
 
-/* 年度倒计时和进度 */
-function updateYearProgress() {
-  const now = new Date();
-
-  const year = now.getFullYear();
-  const start = new Date(year,0,1);
-  const end = new Date(year+1,0,1);
-
-  const today = new Date(year,now.getMonth(),now.getDate());
-
-  const elapsed = today - start;
-  const total = end - start;
-
-  const percent = Math.round(elapsed / total * 100);
-  const days = Math.max(
-    0,
-    Math.ceil((end - today) / 86400000) - 1
-  );
-
-  document.getElementById("year-days").textContent = days;
-  document.getElementById("year-percent").textContent = percent;
-  document.getElementById("year-fill").style.width = percent + "%";
-}
-
 /* 初始化 */
 function updateWidget() {
   updateClock();
-  updateYearProgress();
 }
 
 updateWidget();
 setInterval(updateWidget,1000);
 loadMindfulQuote();
 
-/* 天气和最近目标目前仍是示例内容，可在后续接入对应数据源。 */
+/* 天气目前仍是示例内容，可在后续接入数据源。 */
 </script>
 
 </body>
